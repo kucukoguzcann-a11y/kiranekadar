@@ -14,7 +14,7 @@ import BuildingAgeChart from '@/components/analytics/building-age-chart';
 import SqmPriceChart from '@/components/analytics/sqm-price-chart';
 import DataTable from '@/components/analytics/data-table';
 
-export default async function NeighborhoodView({ city, district, neighborhood }: { city: string; district: string; neighborhood: string }) {
+export default async function NeighborhoodView({ city, district, neighborhood, roomCount }: { city: string; district: string; neighborhood: string; roomCount?: string }) {
   // 1. Fetch location records
   const dbCity = await prisma.city.findUnique({ where: { slug: city } });
   if (!dbCity) notFound();
@@ -36,7 +36,7 @@ export default async function NeighborhoodView({ city, district, neighborhood }:
 
   // 3. Fetch approved reports for calculations
   const reports = await prisma.rentReport.findMany({
-    where: { neighborhoodId: dbNeigh.id, status: 'approved' },
+    where: { neighborhoodId: dbNeigh.id, status: 'approved', roomCount: roomCount || undefined },
     select: {
       rentAmount: true,
       netSqm: true,
@@ -127,8 +127,10 @@ export default async function NeighborhoodView({ city, district, neighborhood }:
       {
         "@type": "ListItem",
         "position": 5,
-        "name": dbNeigh.name,
-        "item": `https://kiranekadar.com.tr/${dbCity.slug}-${dbDistrict.slug}-${dbNeigh.slug}-kira-fiyatlari`
+        "name": roomCount ? `${dbNeigh.name} (${roomCount})` : dbNeigh.name,
+        "item": roomCount
+          ? `https://kiranekadar.com.tr/${dbCity.slug}-${dbDistrict.slug}-${dbNeigh.slug}-${roomCount}-kira-fiyatlari`
+          : `https://kiranekadar.com.tr/${dbCity.slug}-${dbDistrict.slug}-${dbNeigh.slug}-kira-fiyatlari`
       }
     ]
   };
@@ -136,9 +138,15 @@ export default async function NeighborhoodView({ city, district, neighborhood }:
   const datasetSchema = reports.length >= 5 ? {
     "@context": "https://schema.org",
     "@type": "Dataset",
-    "name": `${dbCity.name} ${dbDistrict.name} ${dbNeigh.name} Kira Fiyatları Veri Seti`,
-    "description": `${dbCity.name} ili ${dbDistrict.name} ilçesi ${dbNeigh.name} mahallesi genelinde anonim kullanıcılar tarafından bildirilen gerçek kira bedellerini içeren veri seti.`,
-    "url": `https://kiranekadar.com.tr/${dbCity.slug}-${dbDistrict.slug}-${dbNeigh.slug}-kira-fiyatlari`,
+    "name": roomCount
+      ? `${dbCity.name} ${dbDistrict.name} ${dbNeigh.name} ${roomCount} Kira Fiyatları Veri Seti`
+      : `${dbCity.name} ${dbDistrict.name} ${dbNeigh.name} Kira Fiyatları Veri Seti`,
+    "description": roomCount
+      ? `${dbCity.name} ili ${dbDistrict.name} ilçesi ${dbNeigh.name} mahallesi genelinde ${roomCount} oda tipi için paylaşılan gerçek kira bedellerini içeren veri seti.`
+      : `${dbCity.name} ili ${dbDistrict.name} ilçesi ${dbNeigh.name} mahallesi genelinde anonim kullanıcılar tarafından bildirilen gerçek kira bedellerini içeren veri seti.`,
+    "url": roomCount
+      ? `https://kiranekadar.com.tr/${dbCity.slug}-${dbDistrict.slug}-${dbNeigh.slug}-${roomCount}-kira-fiyatlari`
+      : `https://kiranekadar.com.tr/${dbCity.slug}-${dbDistrict.slug}-${dbNeigh.slug}-kira-fiyatlari`,
     "creator": {
       "@type": "Organization",
       "name": "KiraNeKadar"
@@ -244,7 +252,7 @@ export default async function NeighborhoodView({ city, district, neighborhood }:
               {dbDistrict.name}
             </Link>
             <ChevronRight className="h-3 w-3" />
-            <span className="text-gray-700 font-semibold">{dbNeigh.name}</span>
+            <span className="text-gray-700 font-semibold">{dbNeigh.name}{roomCount ? ` (${roomCount})` : ''}</span>
           </nav>
 
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8">
@@ -252,7 +260,7 @@ export default async function NeighborhoodView({ city, district, neighborhood }:
               <div>
                 <div className="section-label">Mahalle Analizi</div>
                 <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
-                  {dbNeigh.name} Mahallesi Kira Analizi
+                  {dbNeigh.name} Mahallesi {roomCount ? `${roomCount} ` : ''}Kira Analizi
                 </h1>
               </div>
               <p className="text-gray-500 text-sm leading-relaxed max-w-2xl">

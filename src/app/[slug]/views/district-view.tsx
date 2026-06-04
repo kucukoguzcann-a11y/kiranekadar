@@ -67,7 +67,7 @@ const ROOM_ORDER = ['1+0', '1+1', '2+1', '3+1', '4+1', '5+1'];
 
 // ─── Page Component ──────────────────────────────────────────────────────────
 
-export default async function DistrictView({ city, district }: { city: string; district: string }) {
+export default async function DistrictView({ city, district, roomCount }: { city: string; district: string; roomCount?: string }) {
   // 1. Fetch city
   const dbCity = await prisma.city.findUnique({ where: { slug: city } });
   if (!dbCity) notFound();
@@ -86,7 +86,7 @@ export default async function DistrictView({ city, district }: { city: string; d
 
   // 3. Fetch all approved reports for district
   const allReports = await prisma.rentReport.findMany({
-    where: { districtId: dbDistrict.id, status: 'approved' },
+    where: { districtId: dbDistrict.id, status: 'approved', roomCount: roomCount || undefined },
     select: {
       rentAmount: true,
       netSqm: true,
@@ -152,8 +152,10 @@ export default async function DistrictView({ city, district }: { city: string; d
       {
         "@type": "ListItem",
         "position": 4,
-        "name": dbDistrict.name,
-        "item": `https://kiranekadar.com.tr/${dbCity.slug}-${dbDistrict.slug}-kira-fiyatlari`
+        "name": roomCount ? `${dbDistrict.name} (${roomCount})` : dbDistrict.name,
+        "item": roomCount
+          ? `https://kiranekadar.com.tr/${dbCity.slug}-${dbDistrict.slug}-${roomCount}-kira-fiyatlari`
+          : `https://kiranekadar.com.tr/${dbCity.slug}-${dbDistrict.slug}-kira-fiyatlari`
       }
     ]
   };
@@ -161,9 +163,15 @@ export default async function DistrictView({ city, district }: { city: string; d
   const datasetSchema = filtered.length >= 5 ? {
     "@context": "https://schema.org",
     "@type": "Dataset",
-    "name": `${dbCity.name} ${dbDistrict.name} Kira Fiyatları Veri Seti`,
-    "description": `${dbCity.name} ili ${dbDistrict.name} ilçesi genelinde anonim kullanıcılar tarafından bildirilen gerçek kira bedellerini içeren veri seti.`,
-    "url": `https://kiranekadar.com.tr/${dbCity.slug}-${dbDistrict.slug}-kira-fiyatlari`,
+    "name": roomCount
+      ? `${dbCity.name} ${dbDistrict.name} ${roomCount} Kira Fiyatları Veri Seti`
+      : `${dbCity.name} ${dbDistrict.name} Kira Fiyatları Veri Seti`,
+    "description": roomCount
+      ? `${dbCity.name} ili ${dbDistrict.name} ilçesi genelinde ${roomCount} oda tipi için paylaşılan gerçek kira bedellerini içeren veri seti.`
+      : `${dbCity.name} ili ${dbDistrict.name} ilçesi genelinde anonim kullanıcılar tarafından bildirilen gerçek kira bedellerini içeren veri seti.`,
+    "url": roomCount
+      ? `https://kiranekadar.com.tr/${dbCity.slug}-${dbDistrict.slug}-${roomCount}-kira-fiyatlari`
+      : `https://kiranekadar.com.tr/${dbCity.slug}-${dbDistrict.slug}-kira-fiyatlari`,
     "creator": {
       "@type": "Organization",
       "name": "KiraNeKadar"
@@ -271,7 +279,7 @@ export default async function DistrictView({ city, district }: { city: string; d
             <ChevronRight className="h-3 w-3" />
             <Link href={`/${dbCity.slug}-kira-fiyatlari`} className="hover:text-gray-700 transition-colors">{dbCity.name}</Link>
             <ChevronRight className="h-3 w-3" />
-            <span className="text-gray-700 font-semibold">{dbDistrict.name}</span>
+            <span className="text-gray-700 font-semibold">{dbDistrict.name}{roomCount ? ` (${roomCount})` : ''}</span>
           </nav>
 
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8">
@@ -279,7 +287,7 @@ export default async function DistrictView({ city, district }: { city: string; d
               <div>
                 <div className="section-label">İlçe Analizi</div>
                 <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
-                  {dbCity.name} {dbDistrict.name} Kira Fiyatları
+                  {dbCity.name} {dbDistrict.name} {roomCount ? `${roomCount} ` : ''}Kira Fiyatları
                 </h1>
               </div>
               <p className="text-gray-500 text-sm leading-relaxed max-w-2xl">

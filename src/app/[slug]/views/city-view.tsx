@@ -56,7 +56,7 @@ const ROOM_ORDER = ['1+0', '1+1', '2+1', '3+1', '4+1', '5+1'];
 
 // ─── Page Component ──────────────────────────────────────────────────────────
 
-export default async function CityView({ city }: { city: string }) {
+export default async function CityView({ city, roomCount }: { city: string; roomCount?: string }) {
   // 1. Fetch city with districts and neighborhoods
   const dbCity = await prisma.city.findUnique({
     where: { slug: city },
@@ -74,7 +74,7 @@ export default async function CityView({ city }: { city: string }) {
 
   // 2. Fetch all approved reports for city
   const allReports = await prisma.rentReport.findMany({
-    where: { cityId: dbCity.id, status: 'approved' },
+    where: { cityId: dbCity.id, status: 'approved', roomCount: roomCount || undefined },
     select: {
       rentAmount: true,
       netSqm: true,
@@ -134,8 +134,10 @@ export default async function CityView({ city }: { city: string }) {
       {
         "@type": "ListItem",
         "position": 3,
-        "name": dbCity.name,
-        "item": `https://kiranekadar.com.tr/${dbCity.slug}-kira-fiyatlari`
+        "name": roomCount ? `${dbCity.name} (${roomCount})` : dbCity.name,
+        "item": roomCount
+          ? `https://kiranekadar.com.tr/${dbCity.slug}-${roomCount}-kira-fiyatlari`
+          : `https://kiranekadar.com.tr/${dbCity.slug}-kira-fiyatlari`
       }
     ]
   };
@@ -239,7 +241,7 @@ export default async function CityView({ city }: { city: string }) {
             <ChevronRight className="h-3 w-3" />
             <Link href="/kira-fiyatlari" className="hover:text-gray-700 transition-colors">Kira Analizi</Link>
             <ChevronRight className="h-3 w-3" />
-            <span className="text-gray-700 font-semibold">{dbCity.name}</span>
+            <span className="text-gray-700 font-semibold">{dbCity.name}{roomCount ? ` (${roomCount})` : ''}</span>
           </nav>
 
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8">
@@ -251,7 +253,7 @@ export default async function CityView({ city }: { city: string }) {
                 <div>
                   <div className="section-label">İl Analizi</div>
                   <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
-                    {dbCity.name} Kira Fiyatları
+                    {dbCity.name} {roomCount ? `${roomCount} ` : ''}Kira Fiyatları
                   </h1>
                 </div>
               </div>
