@@ -245,27 +245,11 @@ export default function HomePage() {
             {/* RIGHT: Area Chart */}
             <div className="hidden lg:flex flex-col animate-fade-in">
               <div className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6 min-h-[380px] flex flex-col justify-between">
-                {!loadingStats && stats && stats.totalReports === 0 ? (
-                  <div className="flex-1 flex flex-col items-center justify-center text-center space-y-4 py-8">
-                    <div className="h-12 w-12 bg-emerald-50 rounded-xl flex items-center justify-center">
-                      <BarChart3 className="h-6 w-6 text-emerald-600" />
-                    </div>
-                    <div className="space-y-1">
-                      <h3 className="text-base font-bold text-gray-900">Veri Girilmesi Bekleniyor</h3>
-                      <p className="text-xs text-gray-500 max-w-[260px] leading-relaxed mx-auto">
-                        Bölgelerin kira dağılım ve grafiklerini göstermek için veri bekleniyor. İlk veriyi siz bildirebilirsiniz!
-                      </p>
-                    </div>
-                    <Button
-                      onClick={handleOpenReportModal}
-                      size="sm"
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs h-9 px-4 cursor-pointer animate-pulse"
-                    >
-                      <PlusCircle className="mr-1.5 h-3.5 w-3.5" />
-                      Kirayı Anonim Bildir
-                    </Button>
+                {loadingStats ? (
+                  <div className="flex-1 flex items-center justify-center py-8">
+                    <div className="h-6 w-6 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
                   </div>
-                ) : (
+                ) : stats && stats.totalReports > 0 ? (
                   <>
                     <div className="flex items-start justify-between mb-6">
                       <div>
@@ -372,6 +356,26 @@ export default function HomePage() {
                       ))}
                     </div>
                   </>
+                ) : (
+                  <div className="flex-1 flex flex-col items-center justify-center text-center space-y-4 py-8">
+                    <div className="h-12 w-12 bg-emerald-50 rounded-xl flex items-center justify-center animate-bounce">
+                      <BarChart3 className="h-6 w-6 text-emerald-600" />
+                    </div>
+                    <div className="space-y-1">
+                      <h3 className="text-base font-bold text-gray-900">Veri Girilmesi Bekleniyor</h3>
+                      <p className="text-xs text-gray-500 max-w-[260px] leading-relaxed mx-auto">
+                        Bölgelerin kira dağılım ve grafiklerini göstermek için veri bekleniyor. İlk veriyi siz bildirebilirsiniz!
+                      </p>
+                    </div>
+                    <Button
+                      onClick={handleOpenReportModal}
+                      size="sm"
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs h-9 px-4 cursor-pointer animate-pulse"
+                    >
+                      <PlusCircle className="mr-1.5 h-3.5 w-3.5" />
+                      Kirayı Anonim Bildir
+                    </Button>
+                  </div>
                 )}
               </div>
             </div>
