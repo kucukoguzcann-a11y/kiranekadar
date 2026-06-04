@@ -244,111 +244,135 @@ export default function HomePage() {
 
             {/* RIGHT: Area Chart */}
             <div className="hidden lg:flex flex-col animate-fade-in">
-              <div className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6">
-                <div className="flex items-start justify-between mb-6">
-                  <div>
-                    <h3 className="text-sm font-bold text-gray-900">İstanbul Mahalle Kira Trendleri</h3>
-                    <p className="text-xs text-gray-500 mt-0.5">Ocak – Haziran 2025 · Medyan kira (₺)</p>
-                  </div>
-                  <span className="green-badge">Güncel Veri</span>
-                </div>
-
-                {mounted ? (
-                  <ResponsiveContainer width="100%" height={220}>
-                    <AreaChart data={HERO_CHART_DATA} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                      <defs>
-                        <linearGradient id="gradKadikoy" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#059669" stopOpacity={0.15} />
-                          <stop offset="95%" stopColor="#059669" stopOpacity={0.0} />
-                        </linearGradient>
-                        <linearGradient id="gradBesiktas" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#F97316" stopOpacity={0.15} />
-                          <stop offset="95%" stopColor="#F97316" stopOpacity={0.0} />
-                        </linearGradient>
-                        <linearGradient id="gradAtasehir" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#2563EB" stopOpacity={0.12} />
-                          <stop offset="95%" stopColor="#2563EB" stopOpacity={0.0} />
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
-                      <XAxis
-                        dataKey="ay"
-                        tick={{ fontSize: 11, fill: '#9CA3AF', fontWeight: 500 }}
-                        axisLine={false}
-                        tickLine={false}
-                      />
-                      <YAxis
-                        tickFormatter={(v) => `${(v / 1000).toFixed(0)}K`}
-                        tick={{ fontSize: 11, fill: '#9CA3AF', fontWeight: 500 }}
-                        axisLine={false}
-                        tickLine={false}
-                        width={38}
-                      />
-                      <Tooltip content={<HeroTooltip />} />
-                      <Legend
-                        wrapperStyle={{ fontSize: '11px', paddingTop: '12px' }}
-                        formatter={(value) =>
-                          value === 'kadikoy' ? 'Kadıköy' :
-                          value === 'besiktas' ? 'Beşiktaş' : 'Ataşehir'
-                        }
-                      />
-                      <Area
-                        type="monotone"
-                        dataKey="besiktas"
-                        name="besiktas"
-                        stroke="#F97316"
-                        strokeWidth={2}
-                        fill="url(#gradBesiktas)"
-                        dot={false}
-                        activeDot={{ r: 4, strokeWidth: 0 }}
-                      />
-                      <Area
-                        type="monotone"
-                        dataKey="kadikoy"
-                        name="kadikoy"
-                        stroke="#059669"
-                        strokeWidth={2.5}
-                        fill="url(#gradKadikoy)"
-                        dot={false}
-                        activeDot={{ r: 4, strokeWidth: 0 }}
-                      />
-                      <Area
-                        type="monotone"
-                        dataKey="atasehir"
-                        name="atasehir"
-                        stroke="#2563EB"
-                        strokeWidth={2}
-                        fill="url(#gradAtasehir)"
-                        dot={false}
-                        activeDot={{ r: 4, strokeWidth: 0 }}
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <div className="h-[220px] flex items-center justify-center">
-                    <div className="h-6 w-6 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
-                  </div>
-                )}
-
-                {/* Mini stat pills */}
-                <div className="mt-4 grid grid-cols-3 gap-3">
-                  {[
-                    { label: 'Kadıköy', value: '32.500 ₺', color: '#059669', change: '+%14' },
-                    { label: 'Beşiktaş', value: '37.000 ₺', color: '#F97316', change: '+%9' },
-                    { label: 'Ataşehir', value: '25.000 ₺', color: '#2563EB', change: '+%14' },
-                  ].map((s) => (
-                    <div key={s.label} className="bg-gray-50 rounded-xl p-3 border border-gray-100">
-                      <div className="flex items-center gap-1.5 mb-1">
-                        <span className="h-2 w-2 rounded-full inline-block" style={{ background: s.color }} />
-                        <span className="text-[10px] font-bold text-gray-500">{s.label}</span>
-                      </div>
-                      <div className="text-sm font-extrabold text-gray-900">{s.value}</div>
-                      <div className="text-[10px] font-bold mt-0.5" style={{ color: s.color }}>
-                        {s.change} yıllık
-                      </div>
+              <div className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6 min-h-[380px] flex flex-col justify-between">
+                {!loadingStats && stats && stats.totalReports === 0 ? (
+                  <div className="flex-1 flex flex-col items-center justify-center text-center space-y-4 py-8">
+                    <div className="h-12 w-12 bg-emerald-50 rounded-xl flex items-center justify-center">
+                      <BarChart3 className="h-6 w-6 text-emerald-600" />
                     </div>
-                  ))}
-                </div>
+                    <div className="space-y-1">
+                      <h3 className="text-base font-bold text-gray-900">Veri Girilmesi Bekleniyor</h3>
+                      <p className="text-xs text-gray-500 max-w-[260px] leading-relaxed mx-auto">
+                        Bölgelerin kira dağılım ve grafiklerini göstermek için veri bekleniyor. İlk veriyi siz bildirebilirsiniz!
+                      </p>
+                    </div>
+                    <Button
+                      onClick={handleOpenReportModal}
+                      size="sm"
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs h-9 px-4 cursor-pointer animate-pulse"
+                    >
+                      <PlusCircle className="mr-1.5 h-3.5 w-3.5" />
+                      Kirayı Anonim Bildir
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex items-start justify-between mb-6">
+                      <div>
+                        <h3 className="text-sm font-bold text-gray-900">İstanbul Mahalle Kira Trendleri</h3>
+                        <p className="text-xs text-gray-500 mt-0.5">Ocak – Haziran 2025 · Medyan kira (₺)</p>
+                      </div>
+                      <span className="green-badge">Güncel Veri</span>
+                    </div>
+
+                    {mounted ? (
+                      <ResponsiveContainer width="100%" height={220}>
+                        <AreaChart data={HERO_CHART_DATA} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                          <defs>
+                            <linearGradient id="gradKadikoy" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#059669" stopOpacity={0.15} />
+                              <stop offset="95%" stopColor="#059669" stopOpacity={0.0} />
+                            </linearGradient>
+                            <linearGradient id="gradBesiktas" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#F97316" stopOpacity={0.15} />
+                              <stop offset="95%" stopColor="#F97316" stopOpacity={0.0} />
+                            </linearGradient>
+                            <linearGradient id="gradAtasehir" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#2563EB" stopOpacity={0.12} />
+                              <stop offset="95%" stopColor="#2563EB" stopOpacity={0.0} />
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
+                          <XAxis
+                            dataKey="ay"
+                            tick={{ fontSize: 11, fill: '#9CA3AF', fontWeight: 500 }}
+                            axisLine={false}
+                            tickLine={false}
+                          />
+                          <YAxis
+                            tickFormatter={(v) => `${(v / 1000).toFixed(0)}K`}
+                            tick={{ fontSize: 11, fill: '#9CA3AF', fontWeight: 500 }}
+                            axisLine={false}
+                            tickLine={false}
+                            width={38}
+                          />
+                          <Tooltip content={<HeroTooltip />} />
+                          <Legend
+                            wrapperStyle={{ fontSize: '11px', paddingTop: '12px' }}
+                            formatter={(value) =>
+                              value === 'kadikoy' ? 'Kadıköy' :
+                              value === 'besiktas' ? 'Beşiktaş' : 'Ataşehir'
+                            }
+                          />
+                          <Area
+                            type="monotone"
+                            dataKey="besiktas"
+                            name="besiktas"
+                            stroke="#F97316"
+                            strokeWidth={2}
+                            fill="url(#gradBesiktas)"
+                            dot={false}
+                            activeDot={{ r: 4, strokeWidth: 0 }}
+                          />
+                          <Area
+                            type="monotone"
+                            dataKey="kadikoy"
+                            name="kadikoy"
+                            stroke="#059669"
+                            strokeWidth={2.5}
+                            fill="url(#gradKadikoy)"
+                            dot={false}
+                            activeDot={{ r: 4, strokeWidth: 0 }}
+                          />
+                          <Area
+                            type="monotone"
+                            dataKey="atasehir"
+                            name="atasehir"
+                            stroke="#2563EB"
+                            strokeWidth={2}
+                            fill="url(#gradAtasehir)"
+                            dot={false}
+                            activeDot={{ r: 4, strokeWidth: 0 }}
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="h-[220px] flex items-center justify-center">
+                        <div className="h-6 w-6 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
+                      </div>
+                    )}
+
+                    {/* Mini stat pills */}
+                    <div className="mt-4 grid grid-cols-3 gap-3">
+                      {[
+                        { label: 'Kadıköy', value: '32.500 ₺', color: '#059669', change: '+%14' },
+                        { label: 'Beşiktaş', value: '37.000 ₺', color: '#F97316', change: '+%9' },
+                        { label: 'Ataşehir', value: '25.000 ₺', color: '#2563EB', change: '+%14' },
+                      ].map((s) => (
+                        <div key={s.label} className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+                          <div className="flex items-center gap-1.5 mb-1">
+                            <span className="h-2 w-2 rounded-full inline-block" style={{ background: s.color }} />
+                            <span className="text-[10px] font-bold text-gray-500">{s.label}</span>
+                          </div>
+                          <div className="text-sm font-extrabold text-gray-900">{s.value}</div>
+                          <div className="text-[10px] font-bold mt-0.5" style={{ color: s.color }}>
+                            {s.change} yıllık
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -462,11 +486,15 @@ export default function HomePage() {
                     </div>
                     <span className="text-xs text-emerald-700 font-semibold bg-emerald-100 px-2 py-0.5 rounded-full">✓ Doğrulanmış</span>
                   </div>
-                  <div className="text-4xl font-black text-emerald-600">31.500 ₺</div>
-                  <div className="mt-2 h-2 bg-emerald-200 rounded-full overflow-hidden">
-                    <div className="h-full bg-emerald-500 rounded-full" style={{ width: '75%' }} />
+                  <div className="text-4xl font-black text-emerald-600">
+                    {loadingStats ? '...' : stats && stats.totalReports > 0 ? '31.500 ₺' : 'Veri bekleniyor'}
                   </div>
-                  <p className="text-xs text-emerald-600 mt-1.5">147 gerçek kira kaydına dayalı medyan</p>
+                  <div className="mt-2 h-2 bg-emerald-200 rounded-full overflow-hidden">
+                    <div className="h-full bg-emerald-500 rounded-full" style={{ width: stats && stats.totalReports > 0 ? '75%' : '0%' }} />
+                  </div>
+                  <p className="text-xs text-emerald-600 mt-1.5">
+                    {loadingStats ? 'Yükleniyor...' : stats && stats.totalReports > 0 ? '147 gerçek kira kaydına dayalı medyan' : 'Veri girilmesi bekleniyor...'}
+                  </p>
                 </div>
               </div>
             </div>
