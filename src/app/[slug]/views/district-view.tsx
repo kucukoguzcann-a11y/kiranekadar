@@ -4,7 +4,7 @@ import prisma from '@/lib/prisma';
 import { formatCurrency } from '@/lib/analytics-engine';
 import NeighborhoodTable from '@/components/analytics/neighborhood-table';
 import {
-  Home, ChevronRight, BarChart3, PlusCircle, MapPin
+  Home, ChevronRight, BarChart3, PlusCircle, MapPin, AlertTriangle
 } from 'lucide-react';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -226,7 +226,7 @@ export default async function DistrictView({ city, district }: { city: string; d
                   <> Bu ilçe, {dbCity.name}'daki ilçelerin <strong className="text-gray-700">{cheaperPct}%'inden</strong> daha uygun fiyatlıdır.</>
                 )}
               </p>
-              {distMedian > 0 && (
+              {distMedian > 0 ? (
                 <div className="inline-flex items-center gap-3 bg-emerald-50 border border-emerald-200 rounded-xl px-5 py-3">
                   <div>
                     <div className="text-[10px] font-bold uppercase tracking-widest text-emerald-500">Medyan Kira</div>
@@ -241,20 +241,27 @@ export default async function DistrictView({ city, district }: { city: string; d
                     </div>
                   )}
                 </div>
+              ) : (
+                <div className="inline-flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-xl px-5 py-3">
+                  <div>
+                    <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Medyan Kira</div>
+                    <div className="text-sm font-semibold text-gray-500">Veri girilmesi bekleniyor</div>
+                  </div>
+                </div>
               )}
             </div>
 
             {/* Stat cards */}
             <div className="grid grid-cols-2 gap-3 md:min-w-[280px]">
               {[
-                { label: 'Veri Sayısı', value: filtered.length.toLocaleString('tr-TR'), color: '#059669', bg: '#ECFDF5' },
-                { label: 'm² Kira', value: distRentPerSqm > 0 ? `${distRentPerSqm.toLocaleString('tr-TR')} ₺` : '—', color: '#F97316', bg: '#FFF7ED' },
-                { label: 'Ortalama', value: distAvg > 0 ? formatCurrency(distAvg) : '—', color: '#2563EB', bg: '#EFF6FF' },
+                { label: 'Veri Sayısı', value: filtered.length > 0 ? filtered.length.toLocaleString('tr-TR') : 'Veri girilmesi bekleniyor', color: '#059669', bg: '#ECFDF5' },
+                { label: 'm² Kira', value: distRentPerSqm > 0 ? `${distRentPerSqm.toLocaleString('tr-TR')} ₺` : 'Veri girilmesi bekleniyor', color: '#F97316', bg: '#FFF7ED' },
+                { label: 'Ortalama', value: distAvg > 0 ? formatCurrency(distAvg) : 'Veri girilmesi bekleniyor', color: '#2563EB', bg: '#EFF6FF' },
                 { label: 'Mahalle Sayısı', value: dbDistrict.neighborhoods.length.toLocaleString('tr-TR'), color: '#7C3AED', bg: '#F5F3FF' },
               ].map(s => (
                 <div key={s.label} className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
                   <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">{s.label}</div>
-                  <div className="text-lg font-extrabold" style={{ color: s.color }}>{s.value}</div>
+                  <div className={s.value === 'Veri girilmesi bekleniyor' ? "text-xs font-semibold text-gray-400" : "text-lg font-extrabold"} style={{ color: s.value === 'Veri girilmesi bekleniyor' ? undefined : s.color }}>{s.value}</div>
                 </div>
               ))}
             </div>
@@ -263,6 +270,17 @@ export default async function DistrictView({ city, district }: { city: string; d
       </div>
 
       <div className="container mx-auto px-4 md:px-6 py-10 max-w-6xl space-y-10">
+        {filtered.length === 0 && (
+          <div className="flex gap-3 p-5 rounded-2xl border border-amber-200 bg-amber-50">
+            <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <h4 className="text-sm font-bold text-amber-800">Veri Girilmesi Bekleniyor</h4>
+              <p className="text-xs text-amber-700 leading-normal">
+                {dbCity.name} / {dbDistrict.name} genelinde henüz onaylanmış bir kira verisi bulunmamaktadır. Veri girilmesi bekleniyor...
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* ── Oda Tipi ── */}
         {roomStats.length > 0 && (
@@ -420,7 +438,7 @@ export default async function DistrictView({ city, district }: { city: string; d
                 Bölgedeki kira bedellerini anlamada medyan ve çeyrek dilim (P25-P75) değerleri en sağlıklı çıktıyı sunmaktadır. {distMedian > 0 ? (
                   <>Analizlerimize göre {dbDistrict.name} genelinde aylık medyan kira tutarı <strong>{formatCurrency(distMedian)}</strong> seviyesinde belirlenmiştir. </>
                 ) : (
-                  <>Bölgeden yeni toplanan veriler işlenmekte olup, yakın gelecekte medyan değerler güncellenecektir. </>
+                  <>Şu anda veri girilmesi bekleniyor olup, yakın gelecekte medyan değerler güncellenecektir. </>
                 )}
                 {distP25 > 0 && distP75 > 0 && (
                   <>İlçedeki kiralık konutların %50'lik ana grubu <strong>{formatCurrency(distP25)}</strong> ile <strong>{formatCurrency(distP75)}</strong> aralığında kontrat imzalamıştır. Bu aralık, bütçe planlaması yaparken gerçekçi hedefler belirlemenize yardımcı olur. </>

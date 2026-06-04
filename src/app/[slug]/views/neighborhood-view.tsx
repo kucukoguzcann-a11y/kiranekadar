@@ -209,9 +209,9 @@ export default async function NeighborhoodView({ city, district, neighborhood }:
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50">
               <FileText className="h-6 w-6 text-emerald-600" />
             </div>
-            <h3 className="text-lg font-bold text-gray-900">Henüz Veri Girişi Yok</h3>
+            <h3 className="text-lg font-bold text-gray-900">Veri Girilmesi Bekleniyor</h3>
             <p className="text-sm text-gray-500 max-w-md mx-auto px-4">
-              {dbNeigh.name} mahallesinde henüz onaylı bir kira verisi bulunmamaktadır. Çevrede oturan tanıdıklarınızdan veri girmelerini isteyebilir veya ilk veriyi siz ekleyebilirsiniz!
+              {dbNeigh.name} mahallesinde henüz onaylı bir kira verisi bulunmamaktadır. Veri girilmesi bekleniyor... Çevrede oturan tanıdıklarınızdan veri girmelerini isteyebilir veya ilk veriyi siz ekleyebilirsiniz!
             </p>
             <div className="pt-2">
               <Link

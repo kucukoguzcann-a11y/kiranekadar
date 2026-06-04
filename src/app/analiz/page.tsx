@@ -385,7 +385,23 @@ export default function AnalizPage() {
 
         {/* ─── Data Panel ───────────────────────────────────────────────── */}
         {summary && !loading && (
-          <div className="space-y-6 animate-fade-in">
+          summary.count === 0 ? (
+            <div className="text-center py-16 bg-white border border-gray-100 rounded-2xl max-w-2xl mx-auto space-y-4 shadow-sm">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50">
+                <Database className="h-6 w-6 text-amber-500" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900">Veri Girilmesi Bekleniyor</h3>
+              <p className="text-sm text-gray-500 max-w-md mx-auto px-4">
+                Seçtiğiniz filtreler veya bölge için henüz doğrulanmış bir kira verisi bulunmamaktadır. Veri girilmesi bekleniyor...
+              </p>
+              <div className="pt-2">
+                <Button onClick={() => window.dispatchEvent(new CustomEvent('open-kira-bildir-modal'))} className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl h-11 px-6 shadow-sm hover:shadow-md transition-all cursor-pointer">
+                  Kirayı Anonim Bildir
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-6 animate-fade-in">
 
             {/* Metric Cards */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -460,7 +476,8 @@ export default function AnalizPage() {
             </div>
 
           </div>
-        )}
+        )
+      )}
       </div>
     </div>
   );

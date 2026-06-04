@@ -4,7 +4,7 @@ import prisma from '@/lib/prisma';
 import { formatCurrency } from '@/lib/analytics-engine';
 import DistrictTable from '@/components/analytics/district-table';
 import {
-  Home, ChevronRight, BarChart3, PlusCircle, ArrowRight
+  Home, ChevronRight, BarChart3, PlusCircle, ArrowRight, AlertTriangle
 } from 'lucide-react';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -207,14 +207,16 @@ export default async function CityView({ city }: { city: string }) {
             {/* Key stats grid */}
             <div className="grid grid-cols-2 md:grid-cols-2 gap-3 md:min-w-[320px]">
               {[
-                { label: 'Medyan Kira', value: cityMedian > 0 ? formatCurrency(cityMedian) : '—', color: '#059669', bg: '#ECFDF5' },
-                { label: 'Ortalama Kira', value: cityAvg > 0 ? formatCurrency(cityAvg) : '—', color: '#2563EB', bg: '#EFF6FF' },
-                { label: 'm² Kira', value: cityRentPerSqm > 0 ? `${cityRentPerSqm.toLocaleString('tr-TR')} ₺` : '—', color: '#F97316', bg: '#FFF7ED' },
-                { label: 'Veri Sayısı', value: filtered.length.toLocaleString('tr-TR'), color: '#7C3AED', bg: '#F5F3FF' },
+                { label: 'Medyan Kira', value: cityMedian > 0 ? formatCurrency(cityMedian) : 'Veri girilmesi bekleniyor', color: '#059669', bg: '#ECFDF5' },
+                { label: 'Ortalama Kira', value: cityAvg > 0 ? formatCurrency(cityAvg) : 'Veri girilmesi bekleniyor', color: '#2563EB', bg: '#EFF6FF' },
+                { label: 'm² Kira', value: cityRentPerSqm > 0 ? `${cityRentPerSqm.toLocaleString('tr-TR')} ₺` : 'Veri girilmesi bekleniyor', color: '#F97316', bg: '#FFF7ED' },
+                { label: 'Veri Sayısı', value: filtered.length > 0 ? filtered.length.toLocaleString('tr-TR') : 'Veri girilmesi bekleniyor', color: '#7C3AED', bg: '#F5F3FF' },
               ].map(stat => (
                 <div key={stat.label} className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
                   <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">{stat.label}</div>
-                  <div className="text-xl font-extrabold" style={{ color: stat.color }}>{stat.value}</div>
+                  <div className={stat.value === 'Veri girilmesi bekleniyor' ? "text-xs font-semibold text-gray-400" : "text-xl font-extrabold"} style={{ color: stat.value === 'Veri girilmesi bekleniyor' ? undefined : stat.color }}>
+                    {stat.value}
+                  </div>
                 </div>
               ))}
             </div>
@@ -223,6 +225,17 @@ export default async function CityView({ city }: { city: string }) {
       </div>
 
       <div className="container mx-auto px-4 md:px-6 py-10 max-w-6xl space-y-10">
+        {filtered.length === 0 && (
+          <div className="flex gap-3 p-5 rounded-2xl border border-amber-200 bg-amber-50">
+            <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <h4 className="text-sm font-bold text-amber-800">Veri Girilmesi Bekleniyor</h4>
+              <p className="text-xs text-amber-700 leading-normal">
+                {dbCity.name} genelinde henüz onaylanmış bir kira verisi bulunmamaktadır. Veri girilmesi bekleniyor...
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* ── Oda Tipi Kırılımı ── */}
         {roomStats.length > 0 && (
@@ -384,7 +397,7 @@ export default async function CityView({ city }: { city: string }) {
                 Şehir genelinde hesaplanan medyan aylık kira bedeli kiralık konut piyasasının tam orta noktasını işaret etmesi açısından en güvenilir göstergedir. {cityMedian > 0 ? (
                   <>Yapılan son analizler doğrultusunda {dbCity.name} genelinde medyan kira bedeli <strong>{formatCurrency(cityMedian)}</strong> olarak ölçülmüştür. Bu değer, şehirdeki konutların yarısının bu tutarın altında, diğer yarısının ise üstünde kiralandığını gösterir. </>
                 ) : (
-                  <>Şu anda toplanan veriler analiz aşamasında olup, yeni bildirimlerle birlikte medyan değerler anlık olarak güncellenmektedir. </>
+                  <>Şu anda veri girilmesi bekleniyor olup, yeni bildirimlerle birlikte medyan değerler anlık olarak güncellenmektedir. </>
                 )} 
                 {cityRentPerSqm > 0 && (
                   <>Metrekare bazlı birim kira bedelinin <strong>{cityRentPerSqm.toLocaleString('tr-TR')} ₺</strong> olması ise, 100 metrekarelik standart bir konut için ortalama fiyat beklentilerini belirlemede önemli bir referans sunmaktadır. </>

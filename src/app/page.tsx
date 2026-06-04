@@ -139,8 +139,26 @@ function HeroTooltip({ active, payload, label }: any) {
 export default function HomePage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [stats, setStats] = useState<any>(null);
+  const [loadingStats, setLoadingStats] = useState(true);
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+    async function fetchStats() {
+      try {
+        const res = await fetch('/api/global-stats');
+        if (res.ok) {
+          const data = await res.json();
+          setStats(data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch global stats:', err);
+      } finally {
+        setLoadingStats(false);
+      }
+    }
+    fetchStats();
+  }, []);
 
   const handleOpenReportModal = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -165,7 +183,15 @@ export default function HomePage() {
               {/* Live badge */}
               <div className="inline-flex items-center gap-2 bg-white rounded-full px-4 py-2 border border-gray-200 shadow-sm">
                 <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse-dot" />
-                <span className="text-xs font-semibold text-gray-600">7.983 gerçek kira verisi aktif</span>
+                <span className="text-xs font-semibold text-gray-600">
+                  {loadingStats ? (
+                    'Yükleniyor...'
+                  ) : stats && stats.totalReports > 0 ? (
+                    `${stats.totalReports.toLocaleString('tr-TR')} gerçek kira verisi aktif`
+                  ) : (
+                    'Kira verisi girilmesi bekleniyor...'
+                  )}
+                </span>
               </div>
 
               {/* Headline */}
@@ -334,13 +360,15 @@ export default function HomePage() {
         <div className="container mx-auto px-4 md:px-6 py-5">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 divide-x divide-gray-100">
             {[
-              { label: 'Gerçek Kira Verisi', value: '7.983', color: '#059669' },
-              { label: 'Aktif Şehir', value: '81', color: '#2563EB' },
-              { label: 'Ortalama Güven Skoru', value: '%76', color: '#F97316' },
-              { label: 'Mahalle Kapsamı', value: '2.100+', color: '#7C3AED' },
+              { label: 'Gerçek Kira Verisi', value: stats && stats.totalReports > 0 ? stats.totalReports.toLocaleString('tr-TR') : 'Veri girilmesi bekleniyor', color: '#059669' },
+              { label: 'Aktif Şehir', value: stats && stats.totalReports > 0 ? stats.activeCitiesCount.toString() : 'Veri girilmesi bekleniyor', color: '#2563EB' },
+              { label: 'Ortalama Güven Skoru', value: stats && stats.totalReports > 0 ? `%${stats.avgConfidence}` : 'Veri girilmesi bekleniyor', color: '#F97316' },
+              { label: 'Mahalle Kapsamı', value: stats && stats.totalReports > 0 ? `${stats.activeNeighborhoodsCount.toLocaleString('tr-TR')}` : 'Veri girilmesi bekleniyor', color: '#7C3AED' },
             ].map((stat) => (
               <div key={stat.label} className="pl-6 first:pl-0">
-                <div className="text-2xl font-extrabold" style={{ color: stat.color }}>{stat.value}</div>
+                <div className={stat.value === 'Veri girilmesi bekleniyor' ? "text-xs font-semibold text-gray-400 mt-1.5" : "text-2xl font-extrabold"} style={{ color: stat.value === 'Veri girilmesi bekleniyor' ? undefined : stat.color }}>
+                  {loadingStats ? 'Yükleniyor...' : stat.value}
+                </div>
                 <div className="text-xs text-gray-500 font-medium mt-0.5">{stat.label}</div>
               </div>
             ))}
@@ -460,25 +488,34 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
-            {POPULAR_CITIES.map((city) => (
-              <Link key={city.slug} href={`/${city.slug}-kira-fiyatlari`}>
-                <div className="bg-white rounded-2xl border border-gray-100 p-5 clean-card-hover group flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-xl bg-gray-50 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
-                      {city.emoji}
+            {POPULAR_CITIES.map((city) => {
+              const pc = stats?.popularCities?.find((p: any) => p.slug === city.slug);
+              const count = pc ? pc.count : 0;
+              const avgRent = pc && pc.avgRent > 0 ? `${pc.avgRent.toLocaleString('tr-TR')} ₺` : 'Veri girilmesi bekleniyor';
+              return (
+                <Link key={city.slug} href={`/${city.slug}-kira-fiyatlari`}>
+                  <div className="bg-white rounded-2xl border border-gray-100 p-5 clean-card-hover group flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="h-12 w-12 rounded-xl bg-gray-50 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                        {city.emoji}
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-gray-900 group-hover:text-emerald-700 transition-colors text-sm">{city.name}</h3>
+                        <p className="text-xs text-gray-400 font-medium">
+                          {loadingStats ? 'Yükleniyor...' : `${count.toLocaleString('tr-TR')} kayıt`}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-bold text-gray-900 group-hover:text-emerald-700 transition-colors text-sm">{city.name}</h3>
-                      <p className="text-xs text-gray-400 font-medium">{city.count.toLocaleString('tr-TR')} kayıt</p>
+                    <div className="text-right">
+                      <div className={avgRent === 'Veri girilmesi bekleniyor' ? "text-xs font-semibold text-gray-400" : "text-base font-extrabold text-gray-900"}>
+                        {loadingStats ? 'Yükleniyor...' : avgRent}
+                      </div>
+                      <div className="text-[10px] text-gray-400 font-semibold uppercase tracking-wide">ort. kira</div>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-base font-extrabold text-gray-900">{city.avgRent}</div>
-                    <div className="text-[10px] text-gray-400 font-semibold uppercase tracking-wide">ort. kira</div>
-                  </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>

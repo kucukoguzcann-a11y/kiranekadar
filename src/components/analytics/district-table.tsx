@@ -201,7 +201,7 @@ export default function DistrictTable({ districts, citySlug }: DistrictTableProp
                   <div className="min-w-0">
                     <div className="font-bold text-sm text-gray-900 truncate">{d.name}</div>
                     <div className="text-[10px] text-gray-400 md:hidden">
-                      {d.count > 0 ? `${d.count} kira kaydı` : 'Veri bekleniyor'}
+                      {d.count > 0 ? `${d.count} kira kaydı` : 'Veri girilmesi bekleniyor'}
                     </div>
                   </div>
                 </div>
@@ -234,7 +234,7 @@ export default function DistrictTable({ districts, citySlug }: DistrictTableProp
                 {d.medianRent > 0 ? (
                   <span className="font-extrabold text-sm text-emerald-700">{formatCurrency(d.medianRent)}</span>
                 ) : (
-                  <span className="text-gray-300 text-sm">—</span>
+                  <span className="text-gray-400 text-xs font-normal">Veri girilmesi bekleniyor</span>
                 )}
               </div>
 

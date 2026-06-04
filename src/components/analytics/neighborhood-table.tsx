@@ -203,7 +203,7 @@ export default function NeighborhoodTable({ neighborhoods, citySlug, districtSlu
                   <div className="min-w-0">
                     <div className="font-bold text-sm text-gray-900 truncate">{n.name}</div>
                     <div className="text-[10px] text-gray-400 md:hidden">
-                      {n.count > 0 ? `${n.count} kira kaydı` : 'Veri bekleniyor'}
+                      {n.count > 0 ? `${n.count} kira kaydı` : 'Veri girilmesi bekleniyor'}
                     </div>
                   </div>
                 </div>
@@ -233,7 +233,7 @@ export default function NeighborhoodTable({ neighborhoods, citySlug, districtSlu
                 {n.medianRent > 0 ? (
                   <span className="font-extrabold text-sm text-emerald-700">{formatCurrency(n.medianRent)}</span>
                 ) : (
-                  <span className="text-gray-200 text-sm">—</span>
+                  <span className="text-gray-400 text-xs font-normal">Veri girilmesi bekleniyor</span>
                 )}
               </div>
 
