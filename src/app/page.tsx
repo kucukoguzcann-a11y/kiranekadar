@@ -397,7 +397,7 @@ export default function HomePage() {
                   İlan fiyatı bir şey söyler, <span className="gradient-text">gerçek kira</span> başka
                 </h2>
                 <p className="text-gray-500 text-sm leading-relaxed">
-                  Sahibinden ve emlakçı sitelerindeki ilanlar, gerçekte ödenenden ortalama <strong className="text-gray-700">%25–35 daha yüksek</strong> fiyat gösterir. Verilerimiz komşundan geliyor.
+                  İlan siteleri ve emlakçı portallerindeki ilanlar, gerçekte ödenenden ortalama <strong className="text-gray-700">%25–35 daha yüksek</strong> fiyat gösterir. Verilerimiz komşundan geliyor.
                 </p>
                 <Button asChild className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl px-6 h-11 shadow-sm hover:shadow-md hover:shadow-emerald-200 transition-all">
                   <Link href="/analiz">
@@ -414,7 +414,7 @@ export default function HomePage() {
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <AlertCircle className="h-4 w-4 text-red-500" />
-                      <span className="text-sm font-bold text-red-700">Sahibinden.com İlan Fiyatı</span>
+                      <span className="text-sm font-bold text-red-700">İlan Fiyatı</span>
                     </div>
                     <span className="text-xs text-red-500 font-semibold bg-red-100 px-2 py-0.5 rounded-full">+%36 şişirilmiş</span>
                   </div>

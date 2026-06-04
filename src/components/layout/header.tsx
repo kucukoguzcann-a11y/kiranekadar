@@ -212,8 +212,11 @@ export default function Header({ user }: HeaderProps) {
             </DropdownMenu>
           ) : (
             <>
-              <Button variant="ghost" asChild className="text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 h-9 px-4">
+              <Button variant="ghost" asChild className="text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 h-9 px-3">
                 <Link href="/login">Giriş Yap</Link>
+              </Button>
+              <Button variant="ghost" asChild className="text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 h-9 px-3">
+                <Link href="/register">Üye Ol</Link>
               </Button>
               <Button
                 onClick={() => setShowPreFormModal(true)}
@@ -272,6 +275,9 @@ export default function Header({ user }: HeaderProps) {
                 <>
                   <Button variant="ghost" asChild className="justify-start text-gray-700 hover:bg-gray-50 font-medium">
                     <Link href="/login" onClick={() => setMobileOpen(false)}>Giriş Yap</Link>
+                  </Button>
+                  <Button variant="ghost" asChild className="justify-start text-gray-700 hover:bg-gray-50 font-medium">
+                    <Link href="/register" onClick={() => setMobileOpen(false)}>Üye Ol</Link>
                   </Button>
                   <Button
                     onClick={() => {
