@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const totalReports = await prisma.rentReport.count({
@@ -60,12 +62,29 @@ export async function GET() {
       })
     );
 
+    // Fetch 3 latest approved reports for live feed
+    const latestReports = await prisma.rentReport.findMany({
+      where: { status: 'approved' },
+      select: {
+        id: true,
+        roomCount: true,
+        netSqm: true,
+        rentAmount: true,
+        createdAt: true,
+        city: { select: { name: true } },
+        district: { select: { name: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 3,
+    });
+
     return NextResponse.json({
       totalReports,
       activeCitiesCount,
       activeNeighborhoodsCount,
       avgConfidence,
       popularCities: popularCitiesData,
+      latestReports,
     });
   } catch (error) {
     console.error('Global stats error:', error);

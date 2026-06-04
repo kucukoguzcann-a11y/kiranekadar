@@ -146,7 +146,7 @@ export default function HomePage() {
     setMounted(true);
     async function fetchStats() {
       try {
-        const res = await fetch('/api/global-stats');
+        const res = await fetch(`/api/global-stats?t=${Date.now()}`);
         if (res.ok) {
           const data = await res.json();
           setStats(data);
@@ -250,112 +250,51 @@ export default function HomePage() {
                     <div className="h-6 w-6 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
                   </div>
                 ) : stats && stats.totalReports > 0 ? (
-                  <>
-                    <div className="flex items-start justify-between mb-6">
-                      <div>
-                        <h3 className="text-sm font-bold text-gray-900">İstanbul Mahalle Kira Trendleri</h3>
-                        <p className="text-xs text-gray-500 mt-0.5">Ocak – Haziran 2025 · Medyan kira (₺)</p>
-                      </div>
-                      <span className="green-badge">Güncel Veri</span>
-                    </div>
-
-                    {mounted ? (
-                      <ResponsiveContainer width="100%" height={220}>
-                        <AreaChart data={HERO_CHART_DATA} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                          <defs>
-                            <linearGradient id="gradKadikoy" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#059669" stopOpacity={0.15} />
-                              <stop offset="95%" stopColor="#059669" stopOpacity={0.0} />
-                            </linearGradient>
-                            <linearGradient id="gradBesiktas" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#F97316" stopOpacity={0.15} />
-                              <stop offset="95%" stopColor="#F97316" stopOpacity={0.0} />
-                            </linearGradient>
-                            <linearGradient id="gradAtasehir" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#2563EB" stopOpacity={0.12} />
-                              <stop offset="95%" stopColor="#2563EB" stopOpacity={0.0} />
-                            </linearGradient>
-                          </defs>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
-                          <XAxis
-                            dataKey="ay"
-                            tick={{ fontSize: 11, fill: '#9CA3AF', fontWeight: 500 }}
-                            axisLine={false}
-                            tickLine={false}
-                          />
-                          <YAxis
-                            tickFormatter={(v) => `${(v / 1000).toFixed(0)}K`}
-                            tick={{ fontSize: 11, fill: '#9CA3AF', fontWeight: 500 }}
-                            axisLine={false}
-                            tickLine={false}
-                            width={38}
-                          />
-                          <Tooltip content={<HeroTooltip />} />
-                          <Legend
-                            wrapperStyle={{ fontSize: '11px', paddingTop: '12px' }}
-                            formatter={(value) =>
-                              value === 'kadikoy' ? 'Kadıköy' :
-                              value === 'besiktas' ? 'Beşiktaş' : 'Ataşehir'
-                            }
-                          />
-                          <Area
-                            type="monotone"
-                            dataKey="besiktas"
-                            name="besiktas"
-                            stroke="#F97316"
-                            strokeWidth={2}
-                            fill="url(#gradBesiktas)"
-                            dot={false}
-                            activeDot={{ r: 4, strokeWidth: 0 }}
-                          />
-                          <Area
-                            type="monotone"
-                            dataKey="kadikoy"
-                            name="kadikoy"
-                            stroke="#059669"
-                            strokeWidth={2.5}
-                            fill="url(#gradKadikoy)"
-                            dot={false}
-                            activeDot={{ r: 4, strokeWidth: 0 }}
-                          />
-                          <Area
-                            type="monotone"
-                            dataKey="atasehir"
-                            name="atasehir"
-                            stroke="#2563EB"
-                            strokeWidth={2}
-                            fill="url(#gradAtasehir)"
-                            dot={false}
-                            activeDot={{ r: 4, strokeWidth: 0 }}
-                          />
-                        </AreaChart>
-                      </ResponsiveContainer>
-                    ) : (
-                      <div className="h-[220px] flex items-center justify-center">
-                        <div className="h-6 w-6 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
-                      </div>
-                    )}
-
-                    {/* Mini stat pills */}
-                    <div className="mt-4 grid grid-cols-3 gap-3">
-                      {[
-                        { label: 'Kadıköy', value: '32.500 ₺', color: '#059669', change: '+%14' },
-                        { label: 'Beşiktaş', value: '37.000 ₺', color: '#F97316', change: '+%9' },
-                        { label: 'Ataşehir', value: '25.000 ₺', color: '#2563EB', change: '+%14' },
-                      ].map((s) => (
-                        <div key={s.label} className="bg-gray-50 rounded-xl p-3 border border-gray-100">
-                          <div className="flex items-center gap-1.5 mb-1">
-                            <span className="h-2 w-2 rounded-full inline-block" style={{ background: s.color }} />
-                            <span className="text-[10px] font-bold text-gray-500">{s.label}</span>
-                          </div>
-                          <div className="text-sm font-extrabold text-gray-900">{s.value}</div>
-                          <div className="text-[10px] font-bold mt-0.5" style={{ color: s.color }}>
-                            {s.change} yıllık
-                          </div>
+                  <div className="flex-1 flex flex-col justify-between space-y-4">
+                    <div>
+                      <div className="flex items-start justify-between mb-4">
+                        <div>
+                          <h3 className="text-sm font-bold text-gray-900">Son Kira Bildirimleri</h3>
+                          <p className="text-xs text-gray-500 mt-0.5">Topluluk tarafından girilen son onaylı kiralar</p>
                         </div>
-                      ))}
+                        <span className="green-badge inline-flex items-center gap-1">
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                          Canlı
+                        </span>
+                      </div>
+
+                      <div className="space-y-2.5">
+                        {stats.latestReports?.map((report: any) => (
+                          <div key={report.id} className="flex items-center justify-between p-3.5 bg-gray-50 rounded-xl border border-gray-100 hover:border-emerald-200 transition-colors">
+                            <div className="flex items-center gap-3">
+                              <span className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                              </span>
+                              <div>
+                                <div className="font-bold text-xs text-gray-900">{report.city.name}, {report.district.name}</div>
+                                <div className="text-[10px] text-gray-400 font-medium mt-0.5">{report.roomCount} · {report.netSqm} m²</div>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="font-extrabold text-sm text-emerald-600">{report.rentAmount.toLocaleString('tr-TR')} ₺</div>
+                              <div className="text-[9px] text-gray-400 font-medium mt-0.5">
+                                {new Date(report.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </>
+
+                    <div className="pt-2">
+                      <Button asChild variant="outline" size="sm" className="w-full border-gray-200 text-gray-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-xl h-10 font-semibold cursor-pointer">
+                        <Link href="/analiz">
+                          Tüm Analizleri Keşfet
+                        </Link>
+                      </Button>
+                    </div>
+                  </div>
                 ) : (
                   <div className="flex-1 flex flex-col items-center justify-center text-center space-y-4 py-8">
                     <div className="h-12 w-12 bg-emerald-50 rounded-xl flex items-center justify-center animate-bounce">
