@@ -17,9 +17,15 @@ export default function Footer() {
           <div className="space-y-4 md:col-span-1">
             <div className="flex items-center gap-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-600">
-                <BarChart3 className="h-4 w-4 text-white" />
+                <svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 10.5L12 3l9 7.5" />
+                  <path d="M5 10.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9.5" />
+                  <rect x="7" y="14" width="2" height="4" rx="0.5" fill="currentColor" stroke="none" />
+                  <rect x="11" y="11" width="2" height="7" rx="0.5" fill="currentColor" stroke="none" />
+                  <rect x="15" y="8" width="2" height="10" rx="0.5" fill="currentColor" stroke="none" />
+                </svg>
               </div>
-              <span className="text-lg font-bold text-white">KiraNeKadar</span>
+              <span className="text-lg font-bold text-white">kiranekadar</span>
             </div>
             <p className="text-sm text-gray-400 max-w-xs leading-relaxed">
               Gerçek kira verilerini mahalle mahalle analiz et. İlan fiyatlarına değil, kullanıcıların paylaştığı gerçek verilere güven.
@@ -81,7 +87,7 @@ export default function Footer() {
 
         <div className="mt-12 border-t border-gray-800 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs text-gray-500">
-            © {new Date().getFullYear()} KiraNeKadar. Tüm hakları saklıdır. Veriler anonim olarak işlenir.
+            © {new Date().getFullYear()} kiranekadar. Tüm hakları saklıdır. Veriler anonim olarak işlenir.
           </p>
           <div className="flex items-center gap-1.5">
             <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse-dot" />

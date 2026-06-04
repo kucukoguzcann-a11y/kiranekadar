@@ -151,10 +151,16 @@ export default function Header({ user }: HeaderProps) {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity shrink-0">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-600">
-            <BarChart3 className="h-4 w-4 text-white" />
+            <svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 10.5L12 3l9 7.5" />
+              <path d="M5 10.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9.5" />
+              <rect x="7" y="14" width="2" height="4" rx="0.5" fill="currentColor" stroke="none" />
+              <rect x="11" y="11" width="2" height="7" rx="0.5" fill="currentColor" stroke="none" />
+              <rect x="15" y="8" width="2" height="10" rx="0.5" fill="currentColor" stroke="none" />
+            </svg>
           </div>
           <span className="text-xl font-bold text-gray-900 tracking-tight">
-            Kira<span className="text-emerald-600">NeKadar</span>
+            kira<span className="text-emerald-600">nekadar</span>
           </span>
         </Link>
 
