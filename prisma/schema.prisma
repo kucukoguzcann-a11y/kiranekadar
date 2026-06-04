@@ -1,0 +1,218 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Users ────────────────────────────────────────────────────────────────────
+
+model User {
+  id             String    @id @default(uuid())
+  email          String    @unique
+  name           String?
+  role           String    @default("user") // user, admin, moderator
+  emailVerified  Boolean   @default(false) @map("email_verified")
+  status         String    @default("active") // active, suspended, deleted
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  lastLoginAt    DateTime? @map("last_login_at")
+
+  rentReports    RentReport[]
+  favorites      Favorite[]
+  savedSearches  SavedSearch[]
+  auditLogs      AuditLog[]
+
+  @@map("users")
+}
+
+// ─── Locations ────────────────────────────────────────────────────────────────
+
+model City {
+  id         Int      @id @default(autoincrement())
+  name       String
+  slug       String   @unique
+  plateCode  String   @unique @map("plate_code")
+
+  districts      District[]
+  neighborhoods  Neighborhood[]
+  rentReports    RentReport[]
+
+  @@map("cities")
+}
+
+model District {
+  id       Int    @id @default(autoincrement())
+  cityId   Int    @map("city_id")
+  name     String
+  slug     String
+
+  city           City           @relation(fields: [cityId], references: [id])
+  neighborhoods  Neighborhood[]
+  rentReports    RentReport[]
+
+  @@unique([cityId, slug])
+  @@map("districts")
+}
+
+model Neighborhood {
+  id          Int     @id @default(autoincrement())
+  cityId      Int     @map("city_id")
+  districtId  Int     @map("district_id")
+  name        String
+  slug        String
+  latitude    Float?
+  longitude   Float?
+
+  city        City      @relation(fields: [cityId], references: [id])
+  district    District  @relation(fields: [districtId], references: [id])
+  rentReports RentReport[]
+
+  @@unique([districtId, slug])
+  @@map("neighborhoods")
+}
+
+// ─── Rent Reports ─────────────────────────────────────────────────────────────
+
+model RentReport {
+  id               String    @id @default(uuid())
+  userId           String?   @map("user_id")
+  sessionId        String    @map("session_id")
+
+  // Location
+  cityId           Int       @map("city_id")
+  districtId       Int       @map("district_id")
+  neighborhoodId   Int       @map("neighborhood_id")
+  approximateLat   Float?    @map("approximate_lat")
+  approximateLng   Float?    @map("approximate_lng")
+
+  // Property details
+  propertyType     String    @map("property_type") // daire, rezidans, mustakil, villa, studyo, apart
+  roomCount        String    @map("room_count")    // 1+0, 1+1, 2+1...
+  netSqm           Int       @map("net_sqm")
+  grossSqm         Int?      @map("gross_sqm")
+  buildingAgeRange String    @map("building_age_range") // 0, 1-5, 6-10...
+  floorType        String    @map("floor_type")
+  floorNumber      Int?      @map("floor_number")
+  totalFloors      Int?      @map("total_floors")
+
+  // Features
+  hasElevator      Boolean   @default(false) @map("has_elevator")
+  hasParking       Boolean   @default(false) @map("has_parking")
+  isFurnished      Boolean   @default(false) @map("is_furnished")
+  isInSite         Boolean   @default(false) @map("is_in_site")
+  hasBalcony       Boolean   @default(false) @map("has_balcony")
+  heatingType      String    @map("heating_type")  // kombi, merkezi, klima...
+  hasSecurity      Boolean   @default(false) @map("has_security")
+  hasSocialFacility Boolean  @default(false) @map("has_social_facility")
+  isPostEarthquake Boolean?  @map("is_post_earthquake")
+
+  // Rent info
+  rentAmount       Int       @map("rent_amount")
+  duesAmount       Int?      @map("dues_amount")
+  depositAmount    Int?      @map("deposit_amount")
+  currency         String    @default("TRY")
+  rentType         String    @map("rent_type")     // actual_paid, new_contract...
+  contractStartMonth Int?    @map("contract_start_month")
+  contractStartYear  Int?    @map("contract_start_year")
+  lastIncreaseDate DateTime? @map("last_increase_date")
+
+  // Trust & moderation
+  dataSourceConfidence String @map("data_source_confidence") // self, close_contact...
+  trustScore       Int       @default(50) @map("trust_score")
+  status           String    @default("pending") // pending, approved, rejected, flagged
+  ipHash           String    @map("ip_hash")
+  userAgentHash    String?   @map("user_agent_hash")
+  rejectedReason   String?   @map("rejected_reason")
+
+  // Timestamps
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  approvedAt       DateTime? @map("approved_at")
+
+  // Relations
+  user             User?         @relation(fields: [userId], references: [id])
+  city             City          @relation(fields: [cityId], references: [id])
+  district         District      @relation(fields: [districtId], references: [id])
+  neighborhood     Neighborhood  @relation(fields: [neighborhoodId], references: [id])
+
+  @@index([cityId, districtId, neighborhoodId])
+  @@index([status])
+  @@index([trustScore])
+  @@index([createdAt])
+  @@index([rentType])
+  @@map("rent_reports")
+}
+
+// ─── Favorites ────────────────────────────────────────────────────────────────
+
+model Favorite {
+  id             String   @id @default(uuid())
+  userId         String   @map("user_id")
+  cityId         Int      @map("city_id")
+  districtId     Int      @map("district_id")
+  neighborhoodId Int?     @map("neighborhood_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, cityId, districtId, neighborhoodId])
+  @@map("favorites")
+}
+
+// ─── Saved Searches ───────────────────────────────────────────────────────────
+
+model SavedSearch {
+  id             String   @id @default(uuid())
+  userId         String   @map("user_id")
+  cityId         Int      @map("city_id")
+  districtId     Int?     @map("district_id")
+  neighborhoodId Int?     @map("neighborhood_id")
+  filtersJson    String?  @map("filters_json") // In SQLite we can use String to store JSON
+  name           String
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("saved_searches")
+}
+
+// ─── Audit Logs ───────────────────────────────────────────────────────────────
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  actorUserId String   @map("actor_user_id")
+  action      String
+  entityType  String   @map("entity_type")
+  entityId    String   @map("entity_id")
+  beforeJson  String?  @map("before_json") // String store for JSON in SQLite
+  afterJson   String?  @map("after_json")  // String store for JSON in SQLite
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  actor User @relation(fields: [actorUserId], references: [id])
+
+  @@index([entityType, entityId])
+  @@map("audit_logs")
+}
+
+// ─── Analytics Summary ────────────────────────────────────────────────────────
+
+model RentAnalyticsDaily {
+  id              Int      @id @default(autoincrement())
+  date            DateTime
+  cityId          Int      @map("city_id")
+  districtId      Int      @map("district_id")
+  neighborhoodId  Int?     @map("neighborhood_id")
+  roomCount       String?  @map("room_count")
+  propertyType    String?  @map("property_type")
+  medianRent      Int      @map("median_rent")
+  averageRent     Int      @map("average_rent")
+  rentPerSqm      Int      @map("rent_per_sqm")
+  reportCount     Int      @map("report_count")
+  confidenceScore Int      @map("confidence_score")
+
+  @@unique([date, cityId, districtId, neighborhoodId, roomCount, propertyType])
+  @@index([cityId, districtId])
+  @@map("rent_analytics_daily")
+}
