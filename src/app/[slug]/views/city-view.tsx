@@ -308,9 +308,13 @@ export default async function CityView({ city, roomCount }: { city: string; room
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
               <div className="space-y-4">
                 {roomStats.map(rs => (
-                  <div key={rs.room} className="flex items-center gap-4">
+                  <Link
+                    key={rs.room}
+                    href={`/${dbCity.slug}-${rs.room}-kira-fiyatlari`}
+                    className="flex items-center gap-4 group/row hover:opacity-95 transition-all w-full"
+                  >
                     <div className="w-16 shrink-0">
-                      <span className="text-sm font-bold text-gray-700">{rs.room}</span>
+                      <span className="text-sm font-bold text-gray-700 group-hover/row:text-emerald-600 transition-colors">{rs.room}</span>
                     </div>
                     <div className="flex-1 relative h-8 bg-gray-100 rounded-lg overflow-hidden">
                       <div
@@ -326,9 +330,9 @@ export default async function CityView({ city, roomCount }: { city: string; room
                       </div>
                     </div>
                     <div className="w-16 text-right shrink-0">
-                      <span className="text-[10px] text-gray-400 font-medium">{rs.count} kayıt</span>
+                      <span className="text-[10px] text-gray-400 font-medium group-hover/row:text-gray-600 transition-colors">{rs.count} kayıt</span>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
