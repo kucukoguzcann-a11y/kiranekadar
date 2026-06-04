@@ -23,10 +23,34 @@ export function middleware(request: NextRequest) {
   }
 
   // Protect routes that require login
-  if (!user && PROTECTED_ROUTES.some(route => pathname.startsWith(route))) {
-    const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('redirect', pathname);
-    return NextResponse.redirect(loginUrl);
+  if (!user) {
+    if (pathname.startsWith('/harita')) {
+      return NextResponse.redirect(new URL('/kira-haritasi', request.url));
+    }
+    if (pathname.startsWith('/karsilastir')) {
+      return NextResponse.redirect(new URL('/kira-karsilastirma', request.url));
+    }
+    if (pathname.startsWith('/analiz')) {
+      return NextResponse.redirect(new URL('/kira-analizi', request.url));
+    }
+    if (PROTECTED_ROUTES.some(route => pathname.startsWith(route))) {
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('redirect', pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
+  // Redirect logged-in users from teaser pages to dashboards
+  if (user) {
+    if (pathname === '/kira-haritasi') {
+      return NextResponse.redirect(new URL('/harita', request.url));
+    }
+    if (pathname === '/kira-karsilastirma') {
+      return NextResponse.redirect(new URL('/karsilastir', request.url));
+    }
+    if (pathname === '/kira-analizi') {
+      return NextResponse.redirect(new URL('/analiz', request.url));
+    }
   }
 
   // Protect admin routes

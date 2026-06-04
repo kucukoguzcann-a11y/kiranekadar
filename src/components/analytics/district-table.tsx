@@ -252,6 +252,7 @@ export default function DistrictTable({ districts, citySlug }: DistrictTableProp
               <div className="w-full md:w-auto flex justify-end pt-2 md:pt-0 shrink-0">
                 <Link
                   href={`/${citySlug}-${d.slug}-kira-fiyatlari`}
+                  aria-label={`${d.name} ilçesi kira analizini incele`}
                   className="w-full md:w-auto justify-center flex items-center gap-1 text-xs font-semibold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-colors"
                 >
                   İncele <ArrowRight className="h-3 w-3" />

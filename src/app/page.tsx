@@ -596,6 +596,48 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "KiraNeKadar",
+            "url": "https://kiranekadar.com.tr",
+            "logo": "https://kiranekadar.com.tr/icon.svg"
+          })
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "KiraNeKadar",
+            "url": "https://kiranekadar.com.tr"
+          })
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": FAQ_ITEMS.map(faq => ({
+              "@type": "Question",
+              "name": faq.q,
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": faq.a
+              }
+            }))
+          })
+        }}
+      />
     </div>
   );
 }

@@ -69,6 +69,7 @@ export default function Footer() {
             <h4 className="text-xs font-bold mb-5 text-gray-300 uppercase tracking-widest">Destek</h4>
             <ul className="space-y-3">
               <li><Link href="/#nasil-calisir" className="text-sm text-gray-400 hover:text-white transition-colors">Nasıl Çalışır?</Link></li>
+              <li><Link href="/metodoloji" className="text-sm text-gray-400 hover:text-white transition-colors">Veri Metodolojisi</Link></li>
               <li><Link href="/#sss" className="text-sm text-gray-400 hover:text-white transition-colors">Sık Sorulan Sorular</Link></li>
               <li><a href="mailto:destek@kiranekadar.com.tr" className="text-sm text-gray-400 hover:text-white transition-colors">İletişim</a></li>
             </ul>

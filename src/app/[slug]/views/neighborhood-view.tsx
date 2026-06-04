@@ -3,7 +3,8 @@ import { notFound } from 'next/navigation';
 import { cookies } from 'next/headers';
 import prisma from '@/lib/prisma';
 import { formatCurrency, calculateSummary, calculateTrend } from '@/lib/analytics-engine';
-import { ChevronRight, Home, Database, Coins, Layers, ShieldCheck, FileText } from 'lucide-react';
+import { ChevronRight, Home, Database, Coins, Layers, ShieldCheck, FileText, AlertTriangle } from 'lucide-react';
+import { getProgrammaticCopy } from '@/lib/programmatic-copy';
 
 import LoginWall from '@/components/layout/login-wall';
 import MetricCard from '@/components/analytics/metric-card';
@@ -75,6 +76,74 @@ export default async function NeighborhoodView({ city, district, neighborhood }:
   const formattedLastUpdate = summary.lastReportDate
     ? new Date(summary.lastReportDate).toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' })
     : 'Yok';
+
+  const copy = getProgrammaticCopy('neighborhood', dbNeigh.name, reports.length, summary.medianRent, summary.rentPerSqmMedian, dbDistrict.name);
+  const currentYear = new Date().getFullYear();
+
+  // JSON-LD schemas
+  const orgSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "KiraNeKadar",
+    "url": "https://kiranekadar.com.tr",
+    "logo": "https://kiranekadar.com.tr/icon.svg"
+  };
+
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "KiraNeKadar",
+    "url": "https://kiranekadar.com.tr"
+  };
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Ana Sayfa",
+        "item": "https://kiranekadar.com.tr"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Kira Fiyatları",
+        "item": "https://kiranekadar.com.tr/kira-fiyatlari"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": dbCity.name,
+        "item": `https://kiranekadar.com.tr/${dbCity.slug}-kira-fiyatlari`
+      },
+      {
+        "@type": "ListItem",
+        "position": 4,
+        "name": dbDistrict.name,
+        "item": `https://kiranekadar.com.tr/${dbCity.slug}-${dbDistrict.slug}-kira-fiyatlari`
+      },
+      {
+        "@type": "ListItem",
+        "position": 5,
+        "name": dbNeigh.name,
+        "item": `https://kiranekadar.com.tr/${dbCity.slug}-${dbDistrict.slug}-${dbNeigh.slug}-kira-fiyatlari`
+      }
+    ]
+  };
+
+  const datasetSchema = reports.length >= 5 ? {
+    "@context": "https://schema.org",
+    "@type": "Dataset",
+    "name": `${dbCity.name} ${dbDistrict.name} ${dbNeigh.name} Kira Fiyatları Veri Seti`,
+    "description": `${dbCity.name} ili ${dbDistrict.name} ilçesi ${dbNeigh.name} mahallesi genelinde anonim kullanıcılar tarafından bildirilen gerçek kira bedellerini içeren veri seti.`,
+    "url": `https://kiranekadar.com.tr/${dbCity.slug}-${dbDistrict.slug}-${dbNeigh.slug}-kira-fiyatlari`,
+    "creator": {
+      "@type": "Organization",
+      "name": "KiraNeKadar"
+    }
+  } : null;
 
   // Component to render details dashboard
   const DashboardDetails = () => (
@@ -195,6 +264,20 @@ export default async function NeighborhoodView({ city, district, neighborhood }:
       </div>
 
       <div className="container mx-auto px-4 md:px-6 py-10 max-w-6xl space-y-10">
+        {copy.warningText && (
+          <div className="flex gap-3 p-5 rounded-2xl border border-amber-200 bg-amber-50">
+            <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+            <div className="space-y-1 text-left">
+              <h4 className="text-sm font-bold text-amber-800">
+                {reportCount === 0 ? 'Veri Girilmesi Bekleniyor' : 'Sınırlı Temsil Gücü'}
+              </h4>
+              <p className="text-xs text-amber-700 leading-normal">
+                {copy.warningText}
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Dashboard View */}
         {reportCount > 0 ? (
           isLoggedIn ? (
@@ -216,12 +299,94 @@ export default async function NeighborhoodView({ city, district, neighborhood }:
             <div className="pt-2">
               <Link
                 href={`/veri-gir?cityId=${dbCity.id}&districtId=${dbDistrict.id}&neighborhoodId=${dbNeigh.id}`}
-                className="inline-flex h-11 items-center justify-center rounded-xl bg-emerald-600 px-6 text-sm font-semibold text-white hover:bg-emerald-700 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5"
+                className="inline-flex h-11 items-center justify-center rounded-xl bg-emerald-600 px-6 text-sm font-semibold text-white hover:bg-emerald-700 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 cursor-pointer"
               >
                 İlk Veriyi Sen Paylaş
               </Link>
             </div>
           </div>
+        )}
+
+        {/* ── Methodology Box ── */}
+        <section className="bg-emerald-50 border border-emerald-100 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="space-y-2 text-left">
+            <div className="flex items-center gap-2 text-emerald-800 font-bold text-base">
+              <ShieldCheck className="h-5 w-5 text-emerald-600" />
+              <span>KiraNeKadar Veri Metodolojisi</span>
+            </div>
+            <p className="text-sm text-emerald-855 leading-relaxed max-w-2xl">
+              Bu sayfadaki analizler, kullanıcılarımızın anonim olarak paylaştığı gerçek kira bildirimlerinden derlenmiştir.
+              Gelişmiş algoritmalarımız uç değerleri (outliers) eler ve her bildirim için bir <strong>Güven Skoru</strong> hesaplar.
+              {dbNeigh.name} Mahallesi için hesaplanan genel veri güven seviyesi: <strong>{copy.confidenceText}</strong>.
+            </p>
+          </div>
+          <Link
+            href="/metodoloji"
+            className="shrink-0 inline-flex items-center justify-center font-bold text-xs text-emerald-700 hover:text-emerald-800 bg-white border border-emerald-200 px-4 py-2.5 rounded-xl shadow-sm hover:shadow transition-all"
+          >
+            Metodolojiyi Keşfet
+          </Link>
+        </section>
+
+        {/* ── SEO Text ── */}
+        <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 space-y-8">
+          <div>
+            <h2 className="text-2xl font-extrabold text-gray-900 mb-3 text-left">
+              {dbCity.name} {dbDistrict.name} {dbNeigh.name} Mahallesi Kira Piyasası Rehberi
+            </h2>
+            <p className="text-sm text-gray-500 leading-relaxed text-left">
+              {copy.paragraph1}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2 text-left">
+            <div className="space-y-3">
+              <h3 className="text-base font-bold text-gray-900">
+                1. Mahalle Kira Analizi
+              </h3>
+              <p className="text-sm text-gray-500 leading-relaxed">
+                {copy.paragraph2}
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <h3 className="text-base font-bold text-gray-900">
+                2. Daire Tipi ve metrekare Analizleri
+              </h3>
+              <p className="text-sm text-gray-500 leading-relaxed">
+                {copy.paragraph3}
+              </p>
+            </div>
+
+            <div className="space-y-3 md:col-span-2">
+              <h3 className="text-base font-bold text-gray-900">
+                3. Veri Güvenilirliği & Metodoloji Detayları
+              </h3>
+              <p className="text-sm text-gray-500 leading-relaxed">
+                {copy.paragraph4}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* JSON-LD Structured Data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        />
+        {datasetSchema && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(datasetSchema) }}
+          />
         )}
       </div>
     </div>

@@ -23,12 +23,12 @@ export interface ResolvedLocation {
 }
 
 // Slug Resolution Helper
-async function resolveSlug(slug: string): Promise<ResolvedLocation | null> {
+async function resolveSlug(slug: string): Promise<ResolvedLocation & { approvedCount?: number } | null> {
   const decoded = decodeURIComponent(slug).toLowerCase();
   
   // 1. Directory Page
   if (decoded === 'kira-fiyatlari' || decoded === 'kira-fiyatları') {
-    return { type: 'directory' };
+    return { type: 'directory', approvedCount: 1 }; // Always index directories
   }
 
   // Check suffix
@@ -52,10 +52,14 @@ async function resolveSlug(slug: string): Promise<ResolvedLocation | null> {
     where: { slug: remainder },
   });
   if (city) {
+    const approvedCount = await prisma.rentReport.count({
+      where: { cityId: city.id, status: 'approved' },
+    });
     return {
       type: 'city',
       citySlug: city.slug,
       cityName: city.name,
+      approvedCount,
     };
   }
 
@@ -79,12 +83,16 @@ async function resolveSlug(slug: string): Promise<ResolvedLocation | null> {
   // Check if remainder after city matches a district exactly
   const exactDistrict = districts.find((d: any) => d.slug === cityRest);
   if (exactDistrict) {
+    const approvedCount = await prisma.rentReport.count({
+      where: { districtId: exactDistrict.id, status: 'approved' },
+    });
     return {
       type: 'district',
       citySlug: matchingCity.slug,
       districtSlug: exactDistrict.slug,
       cityName: matchingCity.name,
       districtName: exactDistrict.name,
+      approvedCount,
     };
   }
 
@@ -99,10 +107,13 @@ async function resolveSlug(slug: string): Promise<ResolvedLocation | null> {
   // Check if neighborhood exists
   const neighborhood = await prisma.neighborhood.findFirst({
     where: { districtId: matchingDistrict.id, slug: neighSlug },
-    select: { slug: true, name: true },
+    select: { id: true, slug: true, name: true },
   });
 
   if (neighborhood) {
+    const approvedCount = await prisma.rentReport.count({
+      where: { neighborhoodId: neighborhood.id, status: 'approved' },
+    });
     return {
       type: 'neighborhood',
       citySlug: matchingCity.slug,
@@ -111,6 +122,7 @@ async function resolveSlug(slug: string): Promise<ResolvedLocation | null> {
       cityName: matchingCity.name,
       districtName: matchingDistrict.name,
       neighborhoodName: neighborhood.name,
+      approvedCount,
     };
   }
 
@@ -124,28 +136,45 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!resolved) return {};
 
+  const currentYear = new Date().getFullYear();
+  const isNoindex = resolved.approvedCount === 0;
+
+  const robots = isNoindex
+    ? { index: false, follow: true }
+    : { index: true, follow: true };
+
+  const canonicalUrl = `https://kiranekadar.com.tr/${slug}`;
+
   switch (resolved.type) {
     case 'directory':
       return {
-        title: 'İllere Göre Kira Fiyatları Analizi',
+        title: 'İllere Göre Kira Fiyatları Analizi | KiraNeKadar',
         description: 'Türkiye\'nin tüm illerine ait güncel, kullanıcı paylaşımlı gerçek kira fiyatlarını ve mahalle bazlı analizleri inceleyin.',
+        robots,
+        alternates: { canonical: canonicalUrl },
       };
     case 'city':
       return {
-        title: `${resolved.cityName} Kira Fiyatları 2025 – İlçe ve Mahalle Bazlı Analiz`,
-        description: `${resolved.cityName} genelinde gerçek kullanıcı verilerine dayalı kira analizleri. En ucuz ilçeler, en ucuz mahalleler, oda tipi bazlı fiyatlar ve ${resolved.cityName} kira piyasası hakkında tüm detaylar.`,
+        title: `${resolved.cityName} Kira Fiyatları ${currentYear} | İlçe & Mahalle Gerçek Kira Verisi`,
+        description: `${resolved.cityName} kira fiyatlarını medyan, m² ve oda tipi bazında inceleyin. Veriler kullanıcıların anonim olarak paylaştığı gerçek kira bildirimlerinden oluşur.`,
         keywords: [`${resolved.cityName} kira fiyatları`, `${resolved.cityName} kira`, `${resolved.cityName} ilçe kira`, `${resolved.cityName} en ucuz mahalle`],
+        robots,
+        alternates: { canonical: canonicalUrl },
       };
     case 'district':
       return {
-        title: `${resolved.cityName} ${resolved.districtName} Kira Fiyatları 2025 – Mahalle Bazlı Analiz`,
-        description: `${resolved.cityName} ${resolved.districtName} ilçesinde mahalle mahalle gerçek kira fiyatları. En ucuz mahalleler, oda tipi bazlı kira ortalamaları ve ${resolved.districtName} kira piyasası analizi.`,
+        title: `${resolved.districtName} Kira Fiyatları ${currentYear} | ${resolved.cityName} Mahalle Kira Analizi`,
+        description: `${resolved.cityName} ${resolved.districtName} kira fiyatlarını medyan, m² ve oda tipi bazında inceleyin. Veriler kullanıcıların anonim olarak paylaştığı gerçek kira bildirimlerinden oluşur.`,
         keywords: [`${resolved.districtName} kira`, `${resolved.cityName} ${resolved.districtName} kira`, `${resolved.districtName} mahalle kira`, `${resolved.districtName} en ucuz mahalle`],
+        robots,
+        alternates: { canonical: canonicalUrl },
       };
     case 'neighborhood':
       return {
-        title: `${resolved.cityName} ${resolved.districtName} ${resolved.neighborhoodName} Kira Fiyatları & Analizi`,
-        description: `${resolved.cityName} ${resolved.districtName} ${resolved.neighborhoodName} mahallesi güncel gerçek kira bedelleri, oda sayısına göre ortalama kiralar, m² fiyat trendleri ve benzer daire analizleri.`,
+        title: `${resolved.neighborhoodName} Kira Fiyatları ${currentYear} | ${resolved.districtName} Gerçek Kira Verisi`,
+        description: `${resolved.cityName} ${resolved.districtName} ${resolved.neighborhoodName} Mahallesi kira fiyatlarını medyan, m² ve oda tipi bazında inceleyin. Veriler gerçek kira bildirimlerinden oluşur.`,
+        robots,
+        alternates: { canonical: canonicalUrl },
       };
     default:
       return {};

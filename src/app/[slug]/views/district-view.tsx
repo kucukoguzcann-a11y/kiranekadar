@@ -3,8 +3,9 @@ import { notFound } from 'next/navigation';
 import prisma from '@/lib/prisma';
 import { formatCurrency } from '@/lib/analytics-engine';
 import NeighborhoodTable from '@/components/analytics/neighborhood-table';
+import { getProgrammaticCopy } from '@/lib/programmatic-copy';
 import {
-  Home, ChevronRight, BarChart3, PlusCircle, MapPin, AlertTriangle
+  Home, ChevronRight, BarChart3, PlusCircle, MapPin, AlertTriangle, ShieldCheck
 } from 'lucide-react';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -106,6 +107,68 @@ export default async function DistrictView({ city, district }: { city: string; d
   const distRentPerSqm = calcMedian(sqmPrices);
   const distP25 = calcPercentile(distRents, 25);
   const distP75 = calcPercentile(distRents, 75);
+
+  const copy = getProgrammaticCopy('district', dbDistrict.name, filtered.length, distMedian, distRentPerSqm, dbCity.name);
+  const currentYear = new Date().getFullYear();
+
+  // JSON-LD schemas
+  const orgSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "KiraNeKadar",
+    "url": "https://kiranekadar.com.tr",
+    "logo": "https://kiranekadar.com.tr/icon.svg"
+  };
+
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "KiraNeKadar",
+    "url": "https://kiranekadar.com.tr"
+  };
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Ana Sayfa",
+        "item": "https://kiranekadar.com.tr"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Kira Fiyatları",
+        "item": "https://kiranekadar.com.tr/kira-fiyatlari"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": dbCity.name,
+        "item": `https://kiranekadar.com.tr/${dbCity.slug}-kira-fiyatlari`
+      },
+      {
+        "@type": "ListItem",
+        "position": 4,
+        "name": dbDistrict.name,
+        "item": `https://kiranekadar.com.tr/${dbCity.slug}-${dbDistrict.slug}-kira-fiyatlari`
+      }
+    ]
+  };
+
+  const datasetSchema = filtered.length >= 5 ? {
+    "@context": "https://schema.org",
+    "@type": "Dataset",
+    "name": `${dbCity.name} ${dbDistrict.name} Kira Fiyatları Veri Seti`,
+    "description": `${dbCity.name} ili ${dbDistrict.name} ilçesi genelinde anonim kullanıcılar tarafından bildirilen gerçek kira bedellerini içeren veri seti.`,
+    "url": `https://kiranekadar.com.tr/${dbCity.slug}-${dbDistrict.slug}-kira-fiyatlari`,
+    "creator": {
+      "@type": "Organization",
+      "name": "KiraNeKadar"
+    }
+  } : null;
 
   // 5. Per-neighborhood stats
   const neighMap = new Map<number, { reports: typeof filtered; name: string; slug: string }>();
@@ -270,13 +333,15 @@ export default async function DistrictView({ city, district }: { city: string; d
       </div>
 
       <div className="container mx-auto px-4 md:px-6 py-10 max-w-6xl space-y-10">
-        {filtered.length === 0 && (
+        {copy.warningText && (
           <div className="flex gap-3 p-5 rounded-2xl border border-amber-200 bg-amber-50">
             <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
-            <div className="space-y-1">
-              <h4 className="text-sm font-bold text-amber-800">Veri Girilmesi Bekleniyor</h4>
+            <div className="space-y-1 text-left">
+              <h4 className="text-sm font-bold text-amber-800">
+                {filtered.length === 0 ? 'Veri Girilmesi Bekleniyor' : 'Sınırlı Temsil Gücü'}
+              </h4>
               <p className="text-xs text-amber-700 leading-normal">
-                {dbCity.name} / {dbDistrict.name} genelinde henüz onaylanmış bir kira verisi bulunmamaktadır. Veri girilmesi bekleniyor...
+                {copy.warningText}
               </p>
             </div>
           </div>
@@ -403,7 +468,7 @@ export default async function DistrictView({ city, district }: { city: string; d
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
             <Link
               href={`/veri-gir?cityId=${dbCity.id}&districtId=${dbDistrict.id}`}
-              className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-6 py-3 rounded-xl text-sm transition-all hover:-translate-y-0.5"
+              className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-6 py-3 rounded-xl text-sm transition-all hover:-translate-y-0.5 animate-pulse-glow"
             >
               <PlusCircle className="h-4 w-4" />
               Kirayı Anonim Bildir
@@ -418,40 +483,51 @@ export default async function DistrictView({ city, district }: { city: string; d
           </div>
         </section>
 
+        {/* ── Methodology Box ── */}
+        <section className="bg-emerald-50 border border-emerald-100 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="space-y-2 text-left">
+            <div className="flex items-center gap-2 text-emerald-800 font-bold text-base">
+              <ShieldCheck className="h-5 w-5 text-emerald-600" />
+              <span>KiraNeKadar Veri Metodolojisi</span>
+            </div>
+            <p className="text-sm text-emerald-850 leading-relaxed max-w-2xl">
+              Bu sayfadaki analizler, kullanıcılarımızın anonim olarak paylaştığı gerçek kira bildirimlerinden derlenmiştir.
+              Gelişmiş algoritmalarımız uç değerleri (outliers) eler ve her bildirim için bir <strong>Güven Skoru</strong> hesaplar.
+              {dbDistrict.name} için hesaplanan genel veri güven seviyesi: <strong>{copy.confidenceText}</strong>.
+            </p>
+          </div>
+          <Link
+            href="/metodoloji"
+            className="shrink-0 inline-flex items-center justify-center font-bold text-xs text-emerald-700 hover:text-emerald-800 bg-white border border-emerald-200 px-4 py-2.5 rounded-xl shadow-sm hover:shadow transition-all"
+          >
+            Metodolojiyi Keşfet
+          </Link>
+        </section>
+
         {/* ── SEO Text ── */}
         <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 space-y-8">
           <div>
             <h2 className="text-2xl font-extrabold text-gray-900 mb-3">
               {dbCity.name} {dbDistrict.name} Kiralık Konut Piyasası Rehberi
             </h2>
-            <p className="text-sm text-gray-500 leading-relaxed">
-              {dbCity.name} ilinin en dinamik yerleşim bölgelerinden biri olan {dbDistrict.name}, kiralık konut arayanların ilk odak noktaları arasındadır. Gerek ticari akslara yakınlığı gerekse ulaşım kolaylığı ile hem çalışan nüfus hem de aileler için geniş seçenekler sunar. KiraNeKadar platformundaki <strong>{filtered.length}</strong> onaylı kullanıcı bildirimi doğrultusunda hazırlanan bu analizler, bölgedeki en güncel ve gerçek kontrat bedellerini yansıtmaktadır.
+            <p className="text-sm text-gray-500 leading-relaxed text-left">
+              {copy.paragraph1}
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2 text-left">
             <div className="space-y-3">
               <h3 className="text-base font-bold text-gray-900">
-                1. {dbDistrict.name} Kira Fiyat Seviyesi ve Analizi
+                1. Bölgesel Kira Analizi
               </h3>
               <p className="text-sm text-gray-500 leading-relaxed">
-                Bölgedeki kira bedellerini anlamada medyan ve çeyrek dilim (P25-P75) değerleri en sağlıklı çıktıyı sunmaktadır. {distMedian > 0 ? (
-                  <>Analizlerimize göre {dbDistrict.name} genelinde aylık medyan kira tutarı <strong>{formatCurrency(distMedian)}</strong> seviyesinde belirlenmiştir. </>
-                ) : (
-                  <>Şu anda veri girilmesi bekleniyor olup, yakın gelecekte medyan değerler güncellenecektir. </>
-                )}
-                {distP25 > 0 && distP75 > 0 && (
-                  <>İlçedeki kiralık konutların %50'lik ana grubu <strong>{formatCurrency(distP25)}</strong> ile <strong>{formatCurrency(distP75)}</strong> aralığında kontrat imzalamıştır. Bu aralık, bütçe planlaması yaparken gerçekçi hedefler belirlemenize yardımcı olur. </>
-                )}
-                {distRentPerSqm > 0 && (
-                  <>Ayrıca, birim metrekare başına medyan kira tutarının <strong>{distRentPerSqm.toLocaleString('tr-TR')} ₺</strong> olması da farklı büyüklükteki dairelerin değerini öngörmek açısından kritik bir veridir.</>
-                )}
+                {copy.paragraph2}
               </p>
             </div>
 
             <div className="space-y-3">
               <h3 className="text-base font-bold text-gray-900">
-                2. Mahalle Bazlı Fiyat Dağılımı
+                2. Mahalleler Arası Fiyat Kıyaslamaları
               </h3>
               <p className="text-sm text-gray-500 leading-relaxed">
                 {dbDistrict.name} sınırları içindeki mahalleler arasında, yapılaşma tipi ve sosyal imkanlara bağlı olarak geniş bir fiyat yelpazesi mevcuttur. Metro, metrobüs veya ana arter yollara yürüme mesafesinde olan mahallelerde fiyatlar yukarı yönlü hareket ederken, daha iç kesimlerde kalan ve nispeten eski yapı stokuna sahip mahalleler daha ekonomik alternatifler sunar. Yukarıdaki sıralı mahalle fiyat tablomuz, bütçenize göre en uygun lokasyonları tespit etmenize olanak tanır.
@@ -463,7 +539,7 @@ export default async function DistrictView({ city, district }: { city: string; d
                 3. Oda Sayısına Göre Kiralama Trendleri
               </h3>
               <p className="text-sm text-gray-500 leading-relaxed">
-                Bölgede özellikle 1+1, 2+1 ve 3+1 oda sayılarına göre kiralama talepleri yoğunlaşmaktadır. Çekirdek ailelerin ve tek yaşayanların talepleri, oda tiplerindeki metrekare birim fiyatlarını farklılaştırmaktadır. İlçede oda sayısına göre kiralık evlerin ortalamalarını inceleyerek, hangi konut boyutunun bütçeniz için daha yüksek verim sağlayacağını analiz edebilirsiniz.
+                {copy.paragraph3}
               </p>
             </div>
 
@@ -474,13 +550,41 @@ export default async function DistrictView({ city, district }: { city: string; d
               <ul className="text-sm text-gray-500 space-y-1.5 list-disc pl-4 leading-relaxed">
                 <li>Medyan değerleri göz önünde bulundurarak ilan sitelerinde sunulan fiyat tekliflerini rasyonel biçimde müzakere edin.</li>
                 <li>Aidat oranlarının aylık toplam ödemeniz içindeki payını hesaplamayı unutmayın.</li>
-                <li>Ulaşım ağlarına (otobüs, minibüs, raylı sistemler) mesafeyi günün farklı saatlerindeki trafik durumuna göre test edin.</li>
+                <li>Ulaşım ağlarına (otobüs, minibüs, raylı sistemler) mesafeyi sorgulayın.</li>
                 <li>Mevcut kira bilginizi anonim olarak paylaşarak {dbDistrict.name} konut veri tabanının doğruluğunu artırın.</li>
               </ul>
+            </div>
+
+            <div className="space-y-3 md:col-span-2">
+              <h3 className="text-base font-bold text-gray-900">
+                5. Veri Doğrulama & Metodolojik Yaklaşım
+              </h3>
+              <p className="text-sm text-gray-500 leading-relaxed">
+                {copy.paragraph4}
+              </p>
             </div>
           </div>
         </section>
 
+        {/* JSON-LD Structured Data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        />
+        {datasetSchema && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(datasetSchema) }}
+          />
+        )}
       </div>
     </div>
   );
