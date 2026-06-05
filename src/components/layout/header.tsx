@@ -201,13 +201,6 @@ export default function Header({ user }: HeaderProps) {
                     <User className="h-4 w-4" /> Profilim
                   </Link>
                 </DropdownMenuItem>
-                {(user.role === 'admin' || user.role === 'moderator') && (
-                  <DropdownMenuItem asChild className="rounded-lg text-sm text-gray-700 cursor-pointer">
-                    <Link href="/admin" className="flex items-center gap-2 w-full">
-                      <Shield className="h-4 w-4" /> Admin Panel
-                    </Link>
-                  </DropdownMenuItem>
-                )}
                 <DropdownMenuSeparator className="my-1 bg-gray-100" />
                 <DropdownMenuItem asChild className="rounded-lg text-sm text-red-600 cursor-pointer">
                   <Link href="/api/auth/signout" className="flex items-center gap-2 w-full">

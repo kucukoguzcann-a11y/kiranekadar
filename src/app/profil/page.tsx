@@ -127,11 +127,6 @@ export default function ProfilPage() {
               >
                 Kira Bildir <ArrowRight className="h-3.5 w-3.5" />
               </Button>
-              {userProfile?.role === 'admin' && (
-                <Button asChild className="bg-accent hover:bg-accent/90 text-white text-xs">
-                  <Link href="/admin">Yönetim Paneli</Link>
-                </Button>
-              )}
             </div>
           </CardContent>
         </Card>
