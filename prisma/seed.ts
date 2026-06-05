@@ -121,12 +121,8 @@ async function main() {
 
       if (!dbDistrict) continue;
 
-      // Seed neighborhoods for this district
-      // We will take a subset to avoid overwhelming the database with 50,000 neighborhoods in a quick demo,
-      // but we will insert the main ones (let's do up to 15 neighborhoods per district)
-      const subsetNeighs = neighs.slice(0, 15);
-
-      for (const neighName of subsetNeighs) {
+      // Seed all neighborhoods for this district so location selectors and SEO pages are complete.
+      for (const neighName of neighs) {
         const cleanNeighName = neighName.endsWith(' Mah') ? neighName : `${neighName} Mah`;
         const neighSlug = getSlug(cleanNeighName);
 

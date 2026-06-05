@@ -7,6 +7,70 @@ function getSlug(text: string): string {
   return slugify(text, { lower: true, locale: 'tr', strict: true });
 }
 
+function approximateCityCoordinates(plateCode: string) {
+  if (plateCode === '34') return { lat: 41.0082, lng: 28.9784, latSpread: 0.15, lngSpread: 0.3 };
+  if (plateCode === '35') return { lat: 38.4192, lng: 27.1287, latSpread: 0.1, lngSpread: 0.1 };
+  if (plateCode === '06') return { lat: 39.9334, lng: 32.8597, latSpread: 0.1, lngSpread: 0.1 };
+  if (plateCode === '16') return { lat: 40.1824, lng: 29.0610, latSpread: 0.08, lngSpread: 0.08 };
+  if (plateCode === '07') return { lat: 36.8841, lng: 30.7056, latSpread: 0.08, lngSpread: 0.08 };
+  return { lat: 39.0, lng: 35.0, latSpread: 0.5, lngSpread: 0.5 };
+}
+
+async function ensureDistrictNeighborhoodsComplete(districtId: number) {
+  const district = await prisma.district.findUnique({
+    where: { id: districtId },
+    include: { city: true },
+  });
+
+  if (!district) return;
+
+  let distAndNeighs;
+  try {
+    distAndNeighs = getDistrictsAndNeighbourhoodsByCityCode(district.city.plateCode);
+  } catch (err) {
+    console.error(`getDistrictsAndNeighbourhoodsByCityCode error for ${district.city.plateCode}:`, err);
+    return;
+  }
+
+  const foundNeighs = Object.entries(distAndNeighs).find(([distName]) => getSlug(distName) === district.slug)?.[1] as
+    | string[]
+    | undefined;
+
+  if (!foundNeighs?.length) return;
+
+  const existingNeighs = await prisma.neighborhood.findMany({
+    where: { districtId },
+    select: { slug: true },
+  });
+  const existingSlugs = new Set(existingNeighs.map((n) => n.slug));
+  const coords = approximateCityCoordinates(district.city.plateCode);
+
+  const toCreate = foundNeighs
+    .map((neighName) => {
+      const cleanNeighName = neighName.endsWith(' Mah') ? neighName : `${neighName} Mah`;
+      const neighSlug = getSlug(cleanNeighName);
+
+      if (existingSlugs.has(neighSlug)) return null;
+
+      return {
+        cityId: district.cityId,
+        districtId,
+        name: cleanNeighName,
+        slug: neighSlug,
+        latitude: coords.lat + (Math.random() - 0.5) * coords.latSpread,
+        longitude: coords.lng + (Math.random() - 0.5) * coords.lngSpread,
+      };
+    })
+    .filter((neigh): neigh is NonNullable<typeof neigh> => Boolean(neigh));
+
+  if (toCreate.length > 0) {
+    await prisma.neighborhood.createMany({
+      data: toCreate,
+      skipDuplicates: true,
+    });
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -26,82 +90,12 @@ export async function GET(request: NextRequest) {
       orderBy: { name: 'asc' },
     });
 
-    // Dynamic on-the-fly seeding if database has no neighborhoods for this district
-    if (neighborhoods.length === 0) {
-      const district = await prisma.district.findUnique({
-        where: { id: districtId },
-        include: { city: true },
-      });
+    await ensureDistrictNeighborhoodsComplete(districtId);
 
-      if (district) {
-        let distAndNeighs;
-        try {
-          distAndNeighs = getDistrictsAndNeighbourhoodsByCityCode(district.city.plateCode);
-        } catch (err) {
-          console.error(`getDistrictsAndNeighbourhoodsByCityCode error for ${district.city.plateCode}:`, err);
-        }
-
-        if (distAndNeighs) {
-          let foundNeighs: string[] = [];
-          const targetSlug = district.slug;
-
-          for (const [distName, neighs] of Object.entries(distAndNeighs)) {
-            if (getSlug(distName) === targetSlug) {
-              foundNeighs = neighs as string[];
-              break;
-            }
-          }
-
-          if (foundNeighs.length > 0) {
-            const existingNeighs = await prisma.neighborhood.findMany({
-              where: { districtId },
-              select: { slug: true }
-            });
-            const existingSlugs = new Set(existingNeighs.map(n => n.slug));
-
-            const toCreate = [];
-            for (const neighName of foundNeighs) {
-              const cleanNeighName = neighName.endsWith(' Mah') ? neighName : `${neighName} Mah`;
-              const neighSlug = getSlug(cleanNeighName);
-
-              if (!existingSlugs.has(neighSlug)) {
-                // Standard center coords with small random offset
-                let lat = 39.0 + (Math.random() - 0.5) * 0.5;
-                let lng = 35.0 + (Math.random() - 0.5) * 0.5;
-                
-                // Set approximate coords based on city plate code if known
-                if (district.city.plateCode === '34') { lat = 41.0082 + (Math.random() - 0.5) * 0.15; lng = 28.9784 + (Math.random() - 0.5) * 0.3; }
-                else if (district.city.plateCode === '35') { lat = 38.4192 + (Math.random() - 0.5) * 0.1; lng = 27.1287 + (Math.random() - 0.5) * 0.1; }
-                else if (district.city.plateCode === '06') { lat = 39.9334 + (Math.random() - 0.5) * 0.1; lng = 32.8597 + (Math.random() - 0.5) * 0.1; }
-                else if (district.city.plateCode === '16') { lat = 40.1824 + (Math.random() - 0.5) * 0.08; lng = 29.0610 + (Math.random() - 0.5) * 0.08; }
-                else if (district.city.plateCode === '07') { lat = 36.8841 + (Math.random() - 0.5) * 0.08; lng = 30.7056 + (Math.random() - 0.5) * 0.08; }
-
-                toCreate.push({
-                  cityId: district.cityId,
-                  districtId,
-                  name: cleanNeighName,
-                  slug: neighSlug,
-                  latitude: lat,
-                  longitude: lng,
-                });
-              }
-            }
-
-            if (toCreate.length > 0) {
-              await prisma.neighborhood.createMany({
-                data: toCreate,
-              });
-            }
-
-            // Fetch updated list
-            neighborhoods = await prisma.neighborhood.findMany({
-              where: { districtId },
-              orderBy: { name: 'asc' },
-            });
-          }
-        }
-      }
-    }
+    neighborhoods = await prisma.neighborhood.findMany({
+      where: { districtId },
+      orderBy: { name: 'asc' },
+    });
 
     return NextResponse.json(neighborhoods);
   } catch (error) {
