@@ -63,10 +63,10 @@ export default function KiraHaritasiTeaser() {
             Sahibinden ilan fiyatlarını değil, kiracıların anonim olarak paylaştığı gerçek kira kontratı tutarlarını interaktif harita üzerinde mahalle mahalle keşfedin.
           </p>
           <div className="pt-4 flex flex-col sm:flex-row justify-center gap-3">
-            <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-lg shadow-emerald-950/20 cursor-pointer" asChild>
+            <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-lg shadow-emerald-950/20 cursor-pointer w-full sm:w-auto" asChild>
               <Link href="/register">Ücretsiz Üye Ol</Link>
             </Button>
-            <Button size="lg" variant="outline" className="border-slate-700 text-white hover:bg-slate-800 cursor-pointer" asChild>
+            <Button size="lg" variant="outline" className="border-slate-700 text-white hover:bg-slate-800 cursor-pointer w-full sm:w-auto" asChild>
               <Link href="/login">Giriş Yap</Link>
             </Button>
           </div>

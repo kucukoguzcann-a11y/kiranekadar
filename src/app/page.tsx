@@ -541,12 +541,12 @@ export default function HomePage() {
             <Button
               onClick={handleOpenReportModal}
               size="lg"
-              className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-8 h-12 rounded-xl shadow-lg shadow-emerald-900/30 transition-all hover:shadow-xl hover:-translate-y-0.5 cursor-pointer"
+              className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-8 h-12 rounded-xl shadow-lg shadow-emerald-900/30 transition-all hover:shadow-xl hover:-translate-y-0.5 cursor-pointer w-full sm:w-auto"
             >
               <PlusCircle className="mr-2 h-5 w-5" />
               Kirayı Anonim Bildir
             </Button>
-            <Button size="lg" variant="outline" asChild className="border-white/20 text-white hover:bg-white/10 hover:border-white/30 px-8 h-12 rounded-xl font-semibold bg-transparent">
+            <Button size="lg" variant="outline" asChild className="border-white/20 text-white hover:bg-white/10 hover:border-white/30 px-8 h-12 rounded-xl font-semibold bg-transparent w-full sm:w-auto">
               <Link href="/register">
                 <ArrowRight className="mr-2 h-5 w-5" />
                 Ücretsiz Hesap Aç

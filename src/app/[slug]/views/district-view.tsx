@@ -480,14 +480,14 @@ export default async function DistrictView({ city, district, roomCount }: { city
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
             <Link
               href={`/veri-gir?cityId=${dbCity.id}&districtId=${dbDistrict.id}`}
-              className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-6 py-3 rounded-xl text-sm transition-all hover:-translate-y-0.5 animate-pulse-glow"
+              className="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-6 py-3 rounded-xl text-sm transition-all hover:-translate-y-0.5 animate-pulse-glow w-full sm:w-auto"
             >
               <PlusCircle className="h-4 w-4" />
               Kirayı Anonim Bildir
             </Link>
             <Link
               href={`/analiz?districtId=${dbDistrict.id}`}
-              className="inline-flex items-center gap-2 text-gray-300 hover:text-white font-semibold px-6 py-3 rounded-xl text-sm border border-gray-700 hover:border-gray-500 transition-all"
+              className="inline-flex items-center justify-center gap-2 text-gray-300 hover:text-white font-semibold px-6 py-3 rounded-xl text-sm border border-gray-700 hover:border-gray-500 transition-all w-full sm:w-auto"
             >
               <BarChart3 className="h-4 w-4" />
               Detaylı Analiz Aç

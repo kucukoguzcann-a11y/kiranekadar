@@ -128,12 +128,12 @@ export default function FeaturesStep({ form }: StepProps) {
                 Binanın 1999 yılındaki deprem yönetmeliğinden sonra yapılıp yapılmadığını belirtin.
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
               <button
                 type="button"
                 onClick={() => setValue('isPostEarthquake', true, { shouldValidate: true })}
                 className={cn(
-                  "px-4 py-2 rounded-lg text-xs font-medium border transition-colors",
+                  "px-4 py-2 rounded-lg text-xs font-medium border transition-colors w-full sm:w-auto text-center justify-center flex items-center",
                   isPostEarthquake === true
                     ? "bg-accent border-accent text-white"
                     : "bg-background border-border hover:bg-muted/50 text-muted-foreground"
@@ -145,7 +145,7 @@ export default function FeaturesStep({ form }: StepProps) {
                 type="button"
                 onClick={() => setValue('isPostEarthquake', false, { shouldValidate: true })}
                 className={cn(
-                  "px-4 py-2 rounded-lg text-xs font-medium border transition-colors",
+                  "px-4 py-2 rounded-lg text-xs font-medium border transition-colors w-full sm:w-auto text-center justify-center flex items-center",
                   isPostEarthquake === false
                     ? "bg-destructive border-destructive text-white"
                     : "bg-background border-border hover:bg-muted/50 text-muted-foreground"
@@ -157,7 +157,7 @@ export default function FeaturesStep({ form }: StepProps) {
                 type="button"
                 onClick={() => setValue('isPostEarthquake', null, { shouldValidate: true })}
                 className={cn(
-                  "px-4 py-2 rounded-lg text-xs font-medium border transition-colors",
+                  "px-4 py-2 rounded-lg text-xs font-medium border transition-colors w-full sm:w-auto text-center justify-center flex items-center",
                   isPostEarthquake === null || isPostEarthquake === undefined
                     ? "bg-muted border-muted-foreground/30 text-foreground"
                     : "bg-background border-border hover:bg-muted/50 text-muted-foreground"
