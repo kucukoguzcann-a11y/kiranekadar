@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema, type LoginFormData } from '@/validators/auth';
@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
 
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
@@ -35,8 +36,8 @@ export default function LoginPage() {
         return;
       }
       toast.success('Giriş başarılı!');
-      router.push('/analiz');
-      router.refresh();
+      const redirectTo = searchParams.get('redirect') || '/analiz';
+      window.location.assign(redirectTo);
     } catch {
       toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
     } finally {

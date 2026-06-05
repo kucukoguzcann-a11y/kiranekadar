@@ -197,15 +197,15 @@ export default function Header({ user }: HeaderProps) {
                 </div>
                 <DropdownMenuSeparator className="my-1 bg-gray-100" />
                 <DropdownMenuItem asChild className="rounded-lg text-sm text-gray-700 cursor-pointer">
-                  <Link href="/profil" className="flex items-center gap-2 w-full">
+                  <a href="/profil" className="flex items-center gap-2 w-full">
                     <User className="h-4 w-4" /> Profilim
-                  </Link>
+                  </a>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="my-1 bg-gray-100" />
                 <DropdownMenuItem asChild className="rounded-lg text-sm text-red-600 cursor-pointer">
-                  <Link href="/api/auth/signout" className="flex items-center gap-2 w-full">
+                  <a href="/api/auth/signout" className="flex items-center gap-2 w-full">
                     <LogOut className="h-4 w-4" /> Çıkış Yap
-                  </Link>
+                  </a>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -256,19 +256,19 @@ export default function Header({ user }: HeaderProps) {
               {user ? (
                 <>
                   <div className="px-3 py-2 text-xs text-gray-500 truncate">{user.email}</div>
-                  <Link
+                  <a
                     href="/profil"
                     onClick={() => setMobileOpen(false)}
                     className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
                   >
                     <User className="h-4 w-4" /> Profilim
-                  </Link>
-                  <Link
+                  </a>
+                  <a
                     href="/api/auth/signout"
                     className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium text-red-600 hover:bg-red-50"
                   >
                     <LogOut className="h-4 w-4" /> Çıkış Yap
-                  </Link>
+                  </a>
                 </>
               ) : (
                 <>
