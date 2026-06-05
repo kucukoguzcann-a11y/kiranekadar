@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import { cookies } from 'next/headers';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import Header from '@/components/layout/header';
@@ -29,12 +30,24 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const cookieStore = await cookies();
+  const authCookie = cookieStore.get('kira-auth');
+  let user = null;
+
+  if (authCookie?.value) {
+    try {
+      user = JSON.parse(authCookie.value);
+    } catch {
+      user = null;
+    }
+  }
+
   return (
     <html lang="tr" className={inter.variable}>
       <body className="min-h-screen flex flex-col antialiased">
         <TooltipProvider>
-          <Header />
+          <Header user={user} />
           <main className="flex-1">{children}</main>
           <Footer />
           <Toaster position="top-right" richColors />

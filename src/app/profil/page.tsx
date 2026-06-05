@@ -5,27 +5,43 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { User, Database, ShieldAlert, Loader2, RefreshCw, Trash2, ArrowRight, Home, Info } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { User, Database, Loader2, RefreshCw, Trash2, ArrowRight, Info, Mail, Lock, ShieldCheck } from 'lucide-react';
 import { toast } from 'sonner';
-import { formatCurrency, formatNumber } from '@/lib/analytics-engine';
+import { formatCurrency } from '@/lib/analytics-engine';
 import { cn } from '@/lib/utils';
-import Link from 'next/link';
+
+type UserProfile = {
+  email: string;
+  role: string;
+  name?: string | null;
+};
 
 export default function ProfilPage() {
   const [reports, setReports] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [userProfile, setUserProfile] = useState<any>(null);
+  const [profileLoading, setProfileLoading] = useState(true);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
 
   async function fetchUserProfile() {
+    setProfileLoading(true);
     try {
-      const res = await fetch('/api/auth/me'); // Wait, let's see if we have an /api/auth/me endpoint.
-      // If we don't have it, we can read the cookie or mock it from localstorage/cookie.
+      const res = await fetch('/api/auth/me', { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
         setUserProfile(data.user);
       }
     } catch (err) {
       console.error('User profile load error:', err);
+    } finally {
+      setProfileLoading(false);
     }
   }
 
@@ -45,16 +61,7 @@ export default function ProfilPage() {
   }
 
   useEffect(() => {
-    // Attempt to load profile from document.cookie as fallback
-    const match = document.cookie.match(/(^| )kira-auth=([^;]+)/);
-    if (match) {
-      try {
-        const userObj = JSON.parse(decodeURIComponent(match[2]));
-        setUserProfile(userObj);
-      } catch {
-        setUserProfile(null);
-      }
-    }
+    fetchUserProfile();
     fetchReports();
   }, []);
 
@@ -80,6 +87,41 @@ export default function ProfilPage() {
       }
     } catch {
       toast.error('Bağlantı hatası.');
+    }
+  }
+
+  async function handlePasswordSubmit(e: React.FormEvent) {
+    e.preventDefault();
+
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      toast.error('Yeni şifreler eşleşmiyor.');
+      return;
+    }
+
+    setPasswordLoading(true);
+    try {
+      const res = await fetch('/api/auth/password', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(passwordForm),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error || 'Şifre güncellenemedi.');
+        return;
+      }
+
+      toast.success('Şifreniz güncellendi.');
+      setPasswordForm({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      });
+    } catch {
+      toast.error('Bağlantı hatası.');
+    } finally {
+      setPasswordLoading(false);
     }
   }
 
@@ -110,7 +152,7 @@ export default function ProfilPage() {
               </div>
               <div className="space-y-1">
                 <h2 className="text-xl font-bold">{userProfile?.name || 'Kullanıcı'}</h2>
-                <p className="text-xs text-white/60">{userProfile?.email}</p>
+                <p className="text-xs text-white/60">{profileLoading ? 'Yükleniyor...' : userProfile?.email}</p>
                 <div className="flex items-center gap-1.5 mt-1">
                   <Badge variant="outline" className="text-[10px] text-accent border-accent/40 bg-accent/5 font-bold uppercase tracking-wider">
                     {userProfile?.role === 'admin' ? 'Yönetici' : userProfile?.role === 'moderator' ? 'Moderatör' : 'Üye'}
@@ -130,6 +172,98 @@ export default function ProfilPage() {
             </div>
           </CardContent>
         </Card>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          <Card className="border-border/50 shadow-sm overflow-hidden">
+            <CardHeader className="pb-3 border-b border-border/40 bg-muted/10">
+              <CardTitle className="text-base font-bold flex items-center gap-1.5">
+                <Mail className="h-4 w-4 text-accent" />
+                Profil Bilgileri
+              </CardTitle>
+              <CardDescription className="text-xs">
+                Üyelik sırasında girdiğiniz bilgiler
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-6 space-y-4">
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">Ad Soyad</Label>
+                <div className="rounded-xl border border-border/60 bg-muted/20 px-3 py-2 text-sm font-medium text-foreground min-h-10 flex items-center">
+                  {profileLoading ? 'Yükleniyor...' : (userProfile?.name || '-')}
+                </div>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">E-posta</Label>
+                <div className="rounded-xl border border-border/60 bg-muted/20 px-3 py-2 text-sm font-medium text-foreground min-h-10 flex items-center">
+                  {profileLoading ? 'Yükleniyor...' : (userProfile?.email || '-')}
+                </div>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">Hesap Türü</Label>
+                <div className="rounded-xl border border-border/60 bg-muted/20 px-3 py-2 text-sm font-medium text-foreground min-h-10 flex items-center">
+                  {profileLoading ? 'Yükleniyor...' : (userProfile?.role === 'admin' ? 'Yönetici' : userProfile?.role === 'moderator' ? 'Moderatör' : 'Üye')}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border/50 shadow-sm overflow-hidden">
+            <CardHeader className="pb-3 border-b border-border/40 bg-muted/10">
+              <CardTitle className="text-base font-bold flex items-center gap-1.5">
+                <ShieldCheck className="h-4 w-4 text-accent" />
+                Şifre Değiştir
+              </CardTitle>
+              <CardDescription className="text-xs">
+                Hesabınızın şifresini buradan güncelleyebilirsiniz
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-6">
+              <form onSubmit={handlePasswordSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="currentPassword">Mevcut Şifre</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      id="currentPassword"
+                      type="password"
+                      className="pl-10"
+                      value={passwordForm.currentPassword}
+                      onChange={(e) => setPasswordForm((prev) => ({ ...prev, currentPassword: e.target.value }))}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="newPassword">Yeni Şifre</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      id="newPassword"
+                      type="password"
+                      className="pl-10"
+                      value={passwordForm.newPassword}
+                      onChange={(e) => setPasswordForm((prev) => ({ ...prev, newPassword: e.target.value }))}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Yeni Şifre Tekrar</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      id="confirmPassword"
+                      type="password"
+                      className="pl-10"
+                      value={passwordForm.confirmPassword}
+                      onChange={(e) => setPasswordForm((prev) => ({ ...prev, confirmPassword: e.target.value }))}
+                    />
+                  </div>
+                </div>
+                <Button type="submit" className="w-full bg-accent hover:bg-accent/90" disabled={passwordLoading}>
+                  {passwordLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Güncelleniyor...</> : 'Şifreyi Güncelle'}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* User Submissions Table */}
         <Card className="border-border/50 shadow-sm overflow-hidden">
