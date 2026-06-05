@@ -54,18 +54,16 @@ export async function POST(request: NextRequest) {
     const userAgent = request.headers.get('user-agent') || 'Unknown';
     const ipHash = ip; // In production, hash it: crypto.createHash('sha256').update(ip).digest('hex')
 
-    // 4. Rate Limiting Check / IP report checks
-    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-    const recentReportsCount = await prisma.rentReport.count({
-      where: {
-        ipHash,
-        createdAt: { gte: oneHourAgo },
-      },
+    // 4. Rate Limiting Check: Max 2 reports total per IP
+    const totalReportsFromIp = await prisma.rentReport.count({
+      where: { ipHash },
     });
 
-    if (recentReportsCount >= 5) {
-      return NextResponse.json({ error: 'Çok fazla veri girişi yapıldı. Lütfen daha sonra tekrar deneyin.' }, { status: 429 });
+    if (totalReportsFromIp >= 2) {
+      return NextResponse.json({ error: 'Aynı IP adresinden en fazla 2 veri girişi kabul edilmektedir.' }, { status: 429 });
     }
+
+    const recentReportsCount = totalReportsFromIp;
 
     // Time between reports check (seconds)
     const lastReport = await prisma.rentReport.findFirst({
@@ -128,15 +126,16 @@ export async function POST(request: NextRequest) {
       medianRentForArea,
     });
 
-    // Determine status
-    let status = 'pending';
+    // Determine status: Automatically approve unless outlier is detected or rent is < 5000 TL
+    let status = 'approved';
     let rejectedReason = null;
 
-    if (shouldAutoFlag(outlierResult)) {
+    if (data.rentAmount < 5000) {
+      status = 'flagged';
+      rejectedReason = 'Kira tutarı 5.000 TL altında olduğu için güvenilir olmayan veri kabul edildi.';
+    } else if (shouldAutoFlag(outlierResult)) {
       status = 'flagged';
       rejectedReason = `Uç değer algılandı: ${outlierResult.flags.join(', ')}`;
-    } else if (trustScore >= 65) {
-      status = 'approved'; // High trust scores auto-approve if no outliers
     }
 
     // 8. Create database record
