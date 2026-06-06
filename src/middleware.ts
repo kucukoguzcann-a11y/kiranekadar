@@ -6,7 +6,9 @@ const AUTH_ROUTES = ['/login', '/register'];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const normalizedPathname = pathname.toLowerCase();
+  const trimmedPathname =
+    pathname.length > 1 && pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
+  const normalizedPathname = trimmedPathname.toLowerCase();
 
   if (pathname !== normalizedPathname) {
     const redirectUrl = request.nextUrl.clone();

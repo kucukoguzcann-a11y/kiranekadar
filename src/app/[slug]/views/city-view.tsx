@@ -257,7 +257,7 @@ export default async function CityView({ city, roomCount }: { city: string; room
                   </h1>
                 </div>
               </div>
-              <p className="text-gray-500 text-sm leading-relaxed max-w-2xl">
+              <p data-ai-snippet="true" className="text-gray-500 text-sm leading-relaxed max-w-2xl">
                 {dbCity.name} genelinde <strong className="text-gray-700">{filtered.length}</strong> gerçek kullanıcı verisine dayalı kira piyasası analizi.
                 İlan fiyatlarını değil, gerçekte ödenen kiraları gösteriyoruz.
               </p>

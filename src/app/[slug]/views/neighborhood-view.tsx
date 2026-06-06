@@ -263,7 +263,7 @@ export default async function NeighborhoodView({ city, district, neighborhood, r
                   {dbNeigh.name} Mahallesi {roomCount ? `${roomCount} ` : ''}Kira Analizi
                 </h1>
               </div>
-              <p className="text-gray-500 text-sm leading-relaxed max-w-2xl">
+              <p data-ai-snippet="true" className="text-gray-500 text-sm leading-relaxed max-w-2xl">
                 {dbCity.name} / {dbDistrict.name} / {dbNeigh.name} Mahallesi genelinde gerçek kullanıcı verileriyle oluşturulmuş kira bedelleri ve piyasa istatistikleri.
               </p>
             </div>

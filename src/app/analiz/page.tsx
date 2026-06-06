@@ -31,7 +31,43 @@ import RoomDistributionChart from '@/components/analytics/room-distribution-char
 import BuildingAgeChart from '@/components/analytics/building-age-chart';
 import SqmPriceChart from '@/components/analytics/sqm-price-chart';
 import DataTable from '@/components/analytics/data-table';
-import { pushDataLayerEvent } from '@/lib/data-layer';
+import { pushDataLayerEvent, sanitizeAnalyticsValue } from '@/lib/data-layer';
+
+function AnalyticsSkeleton() {
+  return (
+    <div className="space-y-6" aria-hidden="true">
+      <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+        <div className="h-4 w-28 rounded bg-gray-200" />
+        <div className="mt-3 space-y-2">
+          <div className="h-3 w-full rounded bg-gray-100" />
+          <div className="h-3 w-5/6 rounded bg-gray-100" />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <div key={index} className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+            <div className="h-3 w-20 rounded bg-gray-200" />
+            <div className="mt-4 h-7 w-24 rounded bg-gray-100" />
+            <div className="mt-3 h-3 w-16 rounded bg-gray-100" />
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+        <div className="min-h-[320px] rounded-2xl border border-gray-100 bg-white p-6 shadow-sm lg:col-span-2" />
+        <div className="min-h-[320px] rounded-2xl border border-gray-100 bg-white p-6 shadow-sm" />
+      </div>
+
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+        <div className="min-h-[280px] rounded-2xl border border-gray-100 bg-white p-6 shadow-sm" />
+        <div className="min-h-[280px] rounded-2xl border border-gray-100 bg-white p-6 shadow-sm" />
+      </div>
+
+      <div className="min-h-[420px] rounded-2xl border border-gray-100 bg-white p-6 shadow-sm" />
+    </div>
+  );
+}
 
 export default function AnalizPage() {
   // Location Filters
@@ -58,8 +94,10 @@ export default function AnalizPage() {
   const [trends, setTrends] = useState<any[]>([]);
   const [cityName, setCityName] = useState<string>('');
   const [districtName, setDistrictName] = useState<string>('');
+  const [neighborhoodName, setNeighborhoodName] = useState<string>('');
   const hasMountedFiltersRef = useRef(false);
   const lastReportViewKeyRef = useRef('');
+  const lastFailureKeyRef = useRef('');
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -159,15 +197,56 @@ export default function AnalizPage() {
     ] as const;
 
     trackedFilters.forEach(([filterType, filterValue]) => {
-      if (filterValue && filterValue !== 'all') {
-        pushDataLayerEvent({
-          event: 'filter_usage',
-          filter_type: filterType,
-          filter_value: filterValue,
-        });
-      }
+      pushDataLayerEvent({
+        event: 'filter_usage',
+        filter_type: filterType,
+        filter_value: sanitizeAnalyticsValue(filterValue, `all_${filterType}s`),
+      });
     });
   }, [propertyType, roomCount, dateRange, buildingAge]);
+
+  useEffect(() => {
+    if (!summary || loading || summary.hasEnoughData) return;
+
+    const failureKey = [
+      cityId,
+      districtId,
+      neighborhoodId,
+      propertyType,
+      roomCount,
+      dateRange,
+      buildingAge,
+      summary.count,
+    ].join(':');
+
+    if (lastFailureKeyRef.current === failureKey) return;
+    lastFailureKeyRef.current = failureKey;
+
+    pushDataLayerEvent({
+      event: 'calculation_failed',
+      error_type: 'insufficient_data',
+      requested_location:
+        [cityName, districtName, neighborhoodName].filter(Boolean).join('/') ||
+        sanitizeAnalyticsValue(cityId, 'all_cities'),
+      requested_filters: [
+        sanitizeAnalyticsValue(roomCount, 'all_room_counts'),
+        sanitizeAnalyticsValue(propertyType, 'all_property_types'),
+      ].join('/'),
+    });
+  }, [
+    summary,
+    loading,
+    cityName,
+    districtName,
+    neighborhoodName,
+    cityId,
+    districtId,
+    neighborhoodId,
+    roomCount,
+    propertyType,
+    dateRange,
+    buildingAge,
+  ]);
 
   useEffect(() => {
     if (!summary || loading || summary.count === 0) return;
@@ -187,9 +266,9 @@ export default function AnalizPage() {
 
     pushDataLayerEvent({
       event: 'view_calculation_report',
-      location_city: cityName || String(cityId),
-      location_district: districtName || (districtId ? String(districtId) : ''),
-      property_type: propertyType,
+      location_city: sanitizeAnalyticsValue(cityName || cityId, 'all_cities'),
+      location_district: sanitizeAnalyticsValue(districtName || districtId, 'all_districts'),
+      property_type: sanitizeAnalyticsValue(propertyType, 'all_property_types'),
       result_count: summary.count,
     });
   }, [summary, loading, cityId, districtId, neighborhoodId, propertyType, roomCount, dateRange, cityName, districtName]);
@@ -260,6 +339,9 @@ export default function AnalizPage() {
               }}
               onDistrictResolved={(district) => {
                 setDistrictName(district?.name || '');
+              }}
+              onNeighborhoodResolved={(neighborhood) => {
+                setNeighborhoodName(neighborhood?.name || '');
               }}
             />
           </div>
@@ -435,11 +517,12 @@ export default function AnalizPage() {
 
         {/* ─── Loading State ────────────────────────────────────────────── */}
         {loading && (
-          <div className="h-[200px] w-full flex items-center justify-center bg-white rounded-2xl border border-gray-100 shadow-sm">
-            <div className="flex flex-col items-center gap-3">
-              <Loader2 className="h-8 w-8 text-emerald-600 animate-spin" />
-              <span className="text-xs text-gray-400 font-medium">Analiz verileri yükleniyor...</span>
+          <div className="space-y-4">
+            <div className="flex items-center justify-center gap-3 rounded-2xl border border-emerald-100 bg-emerald-50/70 px-4 py-3 text-xs font-medium text-emerald-800">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span>Analiz verileri yükleniyor...</span>
             </div>
+            <AnalyticsSkeleton />
           </div>
         )}
 
@@ -463,7 +546,7 @@ export default function AnalizPage() {
           ) : (
             <div className="space-y-6 animate-fade-in">
 
-            <aside className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4">
+            <aside data-ai-snippet="true" className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4">
               <h2 className="text-sm font-bold text-emerald-900">Hizli Ozet</h2>
               <div className="mt-2 whitespace-pre-wrap text-xs leading-6 text-emerald-950">
                 {`# Kira Ozeti

@@ -290,7 +290,7 @@ export default async function DistrictView({ city, district, roomCount }: { city
                   {dbCity.name} {dbDistrict.name} {roomCount ? `${roomCount} ` : ''}Kira Fiyatları
                 </h1>
               </div>
-              <p className="text-gray-500 text-sm leading-relaxed max-w-2xl">
+              <p data-ai-snippet="true" className="text-gray-500 text-sm leading-relaxed max-w-2xl">
                 {dbDistrict.name} ilçesinde <strong className="text-gray-700">{filtered.length}</strong> gerçek kira verisine dayalı
                 mahalle bazlı piyasa analizi.
                 {cheaperPct !== null && distMedian > 0 && (

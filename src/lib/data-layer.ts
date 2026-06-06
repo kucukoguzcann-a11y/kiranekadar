@@ -11,3 +11,24 @@ export function pushDataLayerEvent(event: DataLayerEvent) {
   window.dataLayer = window.dataLayer || [];
   window.dataLayer.push(event);
 }
+
+export function sanitizeAnalyticsValue(
+  value: string | number | null | undefined,
+  fallback: string
+) {
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? String(value) : fallback;
+  }
+
+  if (value == null) {
+    return fallback;
+  }
+
+  const normalized = value.toString().trim();
+
+  if (!normalized || normalized.toLowerCase() === 'all') {
+    return fallback;
+  }
+
+  return normalized;
+}

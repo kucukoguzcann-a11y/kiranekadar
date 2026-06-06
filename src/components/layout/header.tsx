@@ -24,7 +24,7 @@ import {
 import LocationSelector from '@/components/forms/location-selector';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { pushDataLayerEvent } from '@/lib/data-layer';
+import { pushDataLayerEvent, sanitizeAnalyticsValue } from '@/lib/data-layer';
 
 interface HeaderProps {
   user?: { email: string; role: string; name?: string } | null;
@@ -140,9 +140,9 @@ export default function Header({ user }: HeaderProps) {
 
     pushDataLayerEvent({
       event: 'rent_calculation_initiated',
-      location_city: analizCityName || String(analizCityId),
-      location_district: analizDistrictName || (analizDistrictId ? String(analizDistrictId) : ''),
-      property_type: 'all',
+      location_city: sanitizeAnalyticsValue(analizCityName || analizCityId, 'all_cities'),
+      location_district: sanitizeAnalyticsValue(analizDistrictName || analizDistrictId, 'all_districts'),
+      property_type: 'all_property_types',
     });
     
     setShowAnalizModal(false);
