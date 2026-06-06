@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { cookies } from 'next/headers';
+import Script from 'next/script';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import Header from '@/components/layout/header';
@@ -46,6 +47,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="tr" className={inter.variable}>
       <body className="min-h-screen flex flex-col antialiased">
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7462168937721680"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
         <TooltipProvider>
           <Header user={user} />
           <main className="flex-1">{children}</main>
