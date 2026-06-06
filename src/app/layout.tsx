@@ -21,9 +21,6 @@ export const metadata: Metadata = {
   description: 'İlan fiyatlarına değil, kullanıcıların paylaştığı gerçek kira verilerine göre bölge, mahalle ve daire özelliklerine göre kira analizi yap.',
   keywords: ['kira analizi', 'kira fiyatları', 'mahalle kira', 'gerçek kira', 'İstanbul kira', 'Ankara kira', 'kira karşılaştırma'],
   authors: [{ name: 'KiraNeKadar' }],
-  verification: {
-    google: 'ewGbRN0EkEw4mQtHQDK_ycBEe5Eg0Lbbr-vmsoSesJI',
-  },
   openGraph: {
     type: 'website',
     locale: 'tr_TR',
