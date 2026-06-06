@@ -24,6 +24,7 @@ import {
 import LocationSelector from '@/components/forms/location-selector';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { pushDataLayerEvent } from '@/lib/data-layer';
 
 interface HeaderProps {
   user?: { email: string; role: string; name?: string } | null;
@@ -52,6 +53,8 @@ export default function Header({ user }: HeaderProps) {
   const [analizCityId, setAnalizCityId] = useState<number>(0);
   const [analizDistrictId, setAnalizDistrictId] = useState<number>(0);
   const [analizNeighborhoodId, setAnalizNeighborhoodId] = useState<number>(0);
+  const [analizCityName, setAnalizCityName] = useState<string>('');
+  const [analizDistrictName, setAnalizDistrictName] = useState<string>('');
 
   const initials = user?.name ? user.name.slice(0, 2).toUpperCase() : user?.email?.slice(0, 2).toUpperCase() || 'U';
 
@@ -134,6 +137,13 @@ export default function Header({ user }: HeaderProps) {
     if (analizNeighborhoodId) {
       params.append('neighborhoodId', String(analizNeighborhoodId));
     }
+
+    pushDataLayerEvent({
+      event: 'rent_calculation_initiated',
+      location_city: analizCityName || String(analizCityId),
+      location_district: analizDistrictName || (analizDistrictId ? String(analizDistrictId) : ''),
+      property_type: 'all',
+    });
     
     setShowAnalizModal(false);
     
@@ -141,6 +151,8 @@ export default function Header({ user }: HeaderProps) {
     setAnalizCityId(0);
     setAnalizDistrictId(0);
     setAnalizNeighborhoodId(0);
+    setAnalizCityName('');
+    setAnalizDistrictName('');
     
     router.push(`/analiz?${params.toString()}`);
   };
@@ -386,6 +398,12 @@ export default function Header({ user }: HeaderProps) {
               }}
               onNeighborhoodChange={(id) => {
                 setAnalizNeighborhoodId(id);
+              }}
+              onCityResolved={(city) => {
+                setAnalizCityName(city?.name || '');
+              }}
+              onDistrictResolved={(district) => {
+                setAnalizDistrictName(district?.name || '');
               }}
             />
 

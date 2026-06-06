@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -31,6 +31,7 @@ import RoomDistributionChart from '@/components/analytics/room-distribution-char
 import BuildingAgeChart from '@/components/analytics/building-age-chart';
 import SqmPriceChart from '@/components/analytics/sqm-price-chart';
 import DataTable from '@/components/analytics/data-table';
+import { pushDataLayerEvent } from '@/lib/data-layer';
 
 export default function AnalizPage() {
   // Location Filters
@@ -55,6 +56,10 @@ export default function AnalizPage() {
   const [summary, setSummary] = useState<any>(null);
   const [reports, setReports] = useState<any[]>([]);
   const [trends, setTrends] = useState<any[]>([]);
+  const [cityName, setCityName] = useState<string>('');
+  const [districtName, setDistrictName] = useState<string>('');
+  const hasMountedFiltersRef = useRef(false);
+  const lastReportViewKeyRef = useRef('');
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -140,6 +145,55 @@ export default function AnalizPage() {
     fetchTrendData();
   }, [cityId, districtId, neighborhoodId]);
 
+  useEffect(() => {
+    if (!hasMountedFiltersRef.current) {
+      hasMountedFiltersRef.current = true;
+      return;
+    }
+
+    const trackedFilters = [
+      ['room_count', roomCount],
+      ['property_type', propertyType],
+      ['date_range', dateRange],
+      ['building_age', buildingAge],
+    ] as const;
+
+    trackedFilters.forEach(([filterType, filterValue]) => {
+      if (filterValue && filterValue !== 'all') {
+        pushDataLayerEvent({
+          event: 'filter_usage',
+          filter_type: filterType,
+          filter_value: filterValue,
+        });
+      }
+    });
+  }, [propertyType, roomCount, dateRange, buildingAge]);
+
+  useEffect(() => {
+    if (!summary || loading || summary.count === 0) return;
+
+    const reportKey = [
+      cityId,
+      districtId,
+      neighborhoodId,
+      propertyType,
+      roomCount,
+      dateRange,
+      summary.count,
+    ].join(':');
+
+    if (lastReportViewKeyRef.current === reportKey) return;
+    lastReportViewKeyRef.current = reportKey;
+
+    pushDataLayerEvent({
+      event: 'view_calculation_report',
+      location_city: cityName || String(cityId),
+      location_district: districtName || (districtId ? String(districtId) : ''),
+      property_type: propertyType,
+      result_count: summary.count,
+    });
+  }, [summary, loading, cityId, districtId, neighborhoodId, propertyType, roomCount, dateRange, cityName, districtName]);
+
   return (
     <div className="min-h-screen bg-[#F8F5EF] py-8">
       <div className="container mx-auto px-4 md:px-6 space-y-6">
@@ -200,6 +254,12 @@ export default function AnalizPage() {
               }}
               onNeighborhoodChange={(id) => {
                 setNeighborhoodId(id);
+              }}
+              onCityResolved={(city) => {
+                setCityName(city?.name || '');
+              }}
+              onDistrictResolved={(district) => {
+                setDistrictName(district?.name || '');
               }}
             />
           </div>
@@ -402,6 +462,20 @@ export default function AnalizPage() {
             </div>
           ) : (
             <div className="space-y-6 animate-fade-in">
+
+            <aside className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4">
+              <h2 className="text-sm font-bold text-emerald-900">Hizli Ozet</h2>
+              <div className="mt-2 whitespace-pre-wrap text-xs leading-6 text-emerald-950">
+                {`# Kira Ozeti
+- Bolge: ${districtName ? `${districtName}, ${cityName}` : cityName || 'Secilen bolge'}
+- Medyan kira: ${formatCurrency(summary.medianRent)}
+- Ortalama kira: ${formatCurrency(summary.averageRent)}
+- m² kira: ${formatCurrency(summary.rentPerSqmMedian)}
+- Kayit sayisi: ${summary.count}
+- Para birimi: TRY
+- Guven skoru: %${summary.confidenceScore}`}
+              </div>
+            </aside>
 
             {/* Metric Cards */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">

@@ -47,6 +47,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="tr" className={inter.variable}>
       <head>
         <script
+          dangerouslySetInnerHTML={{
+            __html: 'window.dataLayer = window.dataLayer || [];',
+          }}
+        />
+        <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7462168937721680"
           crossOrigin="anonymous"

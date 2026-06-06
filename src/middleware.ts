@@ -6,6 +6,14 @@ const AUTH_ROUTES = ['/login', '/register'];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const normalizedPathname = pathname.toLowerCase();
+
+  if (pathname !== normalizedPathname) {
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = normalizedPathname;
+    return NextResponse.redirect(redirectUrl, 308);
+  }
+
   const authCookie = request.cookies.get('kira-auth');
   let user: { email: string; role: string } | null = null;
 

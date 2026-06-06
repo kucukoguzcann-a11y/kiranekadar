@@ -34,6 +34,9 @@ interface LocationSelectorProps {
     neighborhoodId?: string;
   };
   className?: string;
+  onCityResolved?: (city: City | null) => void;
+  onDistrictResolved?: (district: District | null) => void;
+  onNeighborhoodResolved?: (neighborhood: Neighborhood | null) => void;
 }
 
 export default function LocationSelector({
@@ -45,6 +48,9 @@ export default function LocationSelector({
   onNeighborhoodChange,
   errors,
   className = "grid grid-cols-1 md:grid-cols-3 gap-6",
+  onCityResolved,
+  onDistrictResolved,
+  onNeighborhoodResolved,
 }: LocationSelectorProps) {
   const [cities, setCities] = useState<City[]>([]);
   const [districts, setDistricts] = useState<District[]>([]);
@@ -121,6 +127,18 @@ export default function LocationSelector({
     }
     fetchNeighborhoods();
   }, [districtId]);
+
+  useEffect(() => {
+    onCityResolved?.(cities.find((city) => city.id === cityId) || null);
+  }, [cities, cityId, onCityResolved]);
+
+  useEffect(() => {
+    onDistrictResolved?.(districts.find((district) => district.id === districtId) || null);
+  }, [districts, districtId, onDistrictResolved]);
+
+  useEffect(() => {
+    onNeighborhoodResolved?.(neighborhoods.find((neighborhood) => neighborhood.id === neighborhoodId) || null);
+  }, [neighborhoods, neighborhoodId, onNeighborhoodResolved]);
 
   return (
     <div className={className}>
