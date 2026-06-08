@@ -209,20 +209,20 @@ export default function HomePage() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <div className="flex flex-col gap-3 pt-3 sm:flex-row">
                 <Button
                   onClick={handleOpenAnalizModal}
-                  className="flex-1 h-12 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm rounded-xl shadow-md shadow-emerald-100 hover:shadow-lg hover:shadow-emerald-200 transition-all cursor-pointer"
+                  className="flex-1 h-14 rounded-2xl bg-emerald-600 px-5 text-base font-extrabold text-white shadow-lg shadow-emerald-100 transition-all hover:bg-emerald-700 hover:shadow-xl hover:shadow-emerald-200 cursor-pointer sm:h-12 sm:rounded-xl sm:text-sm"
                 >
-                  <Search className="mr-2 h-4 w-4" />
+                  <Search className="mr-2 h-5 w-5 sm:h-4 sm:w-4" />
                   Kira Analizi Yap
                 </Button>
                 <Button
                   onClick={handleOpenReportModal}
                   variant="outline"
-                  className="flex-1 h-12 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 font-semibold text-sm rounded-xl shadow-sm hover:shadow-md transition-all cursor-pointer"
+                  className="flex-1 h-14 rounded-2xl border-2 border-emerald-100 bg-white px-5 text-base font-extrabold text-gray-800 shadow-md transition-all hover:bg-emerald-50 hover:border-emerald-200 hover:shadow-lg cursor-pointer sm:h-12 sm:rounded-xl sm:border-gray-200 sm:text-sm"
                 >
-                  <PlusCircle className="mr-2 h-4 w-4 text-emerald-600" />
+                  <PlusCircle className="mr-2 h-5 w-5 text-emerald-600 sm:h-4 sm:w-4" />
                   Kirayı Anonim Bildir
                 </Button>
               </div>
