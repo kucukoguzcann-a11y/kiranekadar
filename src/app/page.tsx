@@ -171,19 +171,19 @@ export default function HomePage() {
   };
 
   return (
-    <div className="flex flex-col bg-[#F8F5EF] text-gray-900">
+    <div className="flex flex-col overflow-x-hidden bg-[#F8F5EF] text-gray-900">
 
       {/* ═══════════════ HERO SECTION ═══════════════ */}
       <section className="hero-section border-b border-gray-200 overflow-hidden">
-        <div className="container mx-auto px-4 md:px-6 pt-16 pb-12 md:pt-20 md:pb-16">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className="mx-auto w-full max-w-7xl px-3 sm:px-4 md:px-6 pt-10 pb-10 sm:pt-14 sm:pb-12 md:pt-20 md:pb-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
 
             {/* LEFT: Text + Search */}
-            <div className="space-y-8 animate-slide-up">
+            <div className="space-y-6 sm:space-y-8 animate-slide-up">
               {/* Live badge */}
-              <div className="inline-flex items-center gap-2 bg-white rounded-full px-4 py-2 border border-gray-200 shadow-sm">
+              <div className="inline-flex max-w-full items-center gap-2 bg-white rounded-full px-3 py-2 border border-gray-200 shadow-sm sm:px-4">
                 <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse-dot" />
-                <span className="text-xs font-semibold text-gray-600">
+                <span className="min-w-0 truncate text-xs font-semibold text-gray-600">
                   {loadingStats ? (
                     'Yükleniyor...'
                   ) : stats && stats.totalReports > 0 ? (
@@ -196,14 +196,14 @@ export default function HomePage() {
 
               {/* Headline */}
               <div className="space-y-4">
-                <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 leading-tight tracking-tight">
+                <h1 className="text-3xl font-extrabold text-gray-900 leading-tight tracking-tight sm:text-5xl">
                   Mahallendeki{' '}
                   <span className="relative">
                     <span className="gradient-text">gerçek kiralar</span>
                   </span>
                   {' '}kaç TL?
                 </h1>
-                <p className="text-lg text-gray-600 leading-relaxed max-w-xl">
+                <p className="max-w-xl text-base leading-7 text-gray-600 sm:text-lg">
                   İlan fiyatlarına değil, <strong className="text-gray-800 font-semibold">komşuların ödediği gerçek kira</strong> verilerine göre piyasayı keşfet. Anonim, güvenilir ve ücretsiz.
                 </p>
               </div>
@@ -228,13 +228,13 @@ export default function HomePage() {
               </div>
 
               {/* Quick links */}
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="text-xs text-gray-500 font-medium">Popüler:</span>
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                <span className="w-full text-xs text-gray-500 font-medium sm:w-auto">Popüler:</span>
                 {['Kadıköy', 'Beşiktaş', 'Çankaya', 'Karşıyaka'].map(n => (
                   <Link
                     key={n}
                     href="/analiz"
-                    className="text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-full px-3 py-1 transition-colors"
+                    className="text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-full px-3 py-1.5 transition-colors"
                   >
                     {n}
                   </Link>
@@ -324,19 +324,19 @@ export default function HomePage() {
 
       {/* ═══════════════ STATS BAR ═══════════════ */}
       <section className="bg-white border-b border-gray-100">
-        <div className="container mx-auto px-4 md:px-6 py-5">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 divide-x divide-gray-100">
+        <div className="mx-auto w-full max-w-7xl px-3 sm:px-4 md:px-6 py-4 sm:py-5">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4 md:gap-6 md:divide-x md:divide-gray-100">
             {[
               { label: 'Gerçek Kira Verisi', value: stats && stats.totalReports > 0 ? stats.totalReports.toLocaleString('tr-TR') : 'Veri girilmesi bekleniyor', color: '#059669' },
               { label: 'Aktif Şehir', value: stats && stats.totalReports > 0 ? stats.activeCitiesCount.toString() : 'Veri girilmesi bekleniyor', color: '#2563EB' },
               { label: 'Ortalama Güven Skoru', value: stats && stats.totalReports > 0 ? `%${stats.avgConfidence}` : 'Veri girilmesi bekleniyor', color: '#F97316' },
               { label: 'Mahalle Kapsamı', value: stats && stats.totalReports > 0 ? `${stats.activeNeighborhoodsCount.toLocaleString('tr-TR')}` : 'Veri girilmesi bekleniyor', color: '#7C3AED' },
             ].map((stat) => (
-              <div key={stat.label} className="pl-6 first:pl-0">
-                <div className={stat.value === 'Veri girilmesi bekleniyor' ? "text-xs font-semibold text-gray-400 mt-1.5" : "text-2xl font-extrabold"} style={{ color: stat.value === 'Veri girilmesi bekleniyor' ? undefined : stat.color }}>
+              <div key={stat.label} className="rounded-xl bg-gray-50 p-4 md:bg-transparent md:p-0 md:pl-6 md:first:pl-0">
+                <div className={stat.value === 'Veri girilmesi bekleniyor' ? "text-sm font-semibold leading-5 text-gray-400 md:text-xs" : "text-2xl font-extrabold"} style={{ color: stat.value === 'Veri girilmesi bekleniyor' ? undefined : stat.color }}>
                   {loadingStats ? 'Yükleniyor...' : stat.value}
                 </div>
-                <div className="text-xs text-gray-500 font-medium mt-0.5">{stat.label}</div>
+                <div className="text-xs text-gray-500 font-medium mt-1">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -344,11 +344,11 @@ export default function HomePage() {
       </section>
 
       {/* ═══════════════ HOW IT WORKS ═══════════════ */}
-      <section id="nasil-calisir" className="py-20 bg-[#F8F5EF]">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="text-center mb-14 space-y-3">
+      <section id="nasil-calisir" className="py-14 sm:py-20 bg-[#F8F5EF]">
+        <div className="mx-auto w-full max-w-7xl px-3 sm:px-4 md:px-6">
+          <div className="text-center mb-10 space-y-3 sm:mb-14">
             <div className="section-label">Nasıl Çalışır?</div>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
+            <h2 className="text-2xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
               Üç adımda gerçek<br />piyasa verisi
             </h2>
             <p className="text-gray-500 max-w-md mx-auto text-sm leading-relaxed">
@@ -360,7 +360,7 @@ export default function HomePage() {
             {HOW_IT_WORKS.map((item, idx) => (
               <div
                 key={item.step}
-                className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 card-hover group"
+                className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-8 card-hover group"
               >
                 <div className="flex items-start justify-between mb-6">
                   <div
@@ -382,19 +382,19 @@ export default function HomePage() {
       </section>
 
       {/* ═══════════════ COMPARISON CARD ═══════════════ */}
-      <section className="py-20 bg-white border-y border-gray-100">
-        <div className="container mx-auto px-4 md:px-6">
+      <section className="py-14 sm:py-20 bg-white border-y border-gray-100">
+        <div className="mx-auto w-full max-w-7xl px-3 sm:px-4 md:px-6">
           <div className="max-w-4xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
               <div className="space-y-5">
                 <div className="section-label">Gerçeği Gör</div>
-                <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight leading-tight">
+                <h2 className="text-2xl md:text-4xl font-extrabold text-gray-900 tracking-tight leading-tight">
                   İlan fiyatı bir şey söyler, <span className="gradient-text">gerçek kira</span> başka
                 </h2>
                 <p className="text-gray-500 text-sm leading-relaxed">
                   İlan siteleri ve emlakçı portallerindeki ilanlar, gerçekte ödenenden ortalama <strong className="text-gray-700">%25–35 daha yüksek</strong> fiyat gösterir. Verilerimiz komşundan geliyor.
                 </p>
-                <Button asChild className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl px-6 h-11 shadow-sm hover:shadow-md hover:shadow-emerald-200 transition-all">
+                <Button asChild className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl px-6 h-11 shadow-sm hover:shadow-md hover:shadow-emerald-200 transition-all sm:w-auto">
                   <Link href="/analiz">
                     Analize Git
                     <ArrowRight className="ml-2 h-4 w-4" />
@@ -403,17 +403,17 @@ export default function HomePage() {
               </div>
 
               {/* Comparison visual */}
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {/* İlan fiyatı */}
-                <div className="bg-red-50 border border-red-100 rounded-2xl p-5">
-                  <div className="flex items-center justify-between mb-3">
+                <div className="bg-red-50 border border-red-100 rounded-2xl p-4 sm:p-5">
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                     <div className="flex items-center gap-2">
                       <AlertCircle className="h-4 w-4 text-red-500" />
                       <span className="text-sm font-bold text-red-700">İlan Fiyatı</span>
                     </div>
                     <span className="text-xs text-red-500 font-semibold bg-red-100 px-2 py-0.5 rounded-full">+%36 şişirilmiş</span>
                   </div>
-                  <div className="text-4xl font-black text-red-600">42.000 ₺</div>
+                  <div className="text-3xl font-black text-red-600 sm:text-4xl">42.000 ₺</div>
                   <div className="mt-2 h-2 bg-red-200 rounded-full overflow-hidden">
                     <div className="h-full bg-red-400 rounded-full" style={{ width: '100%' }} />
                   </div>
@@ -421,15 +421,15 @@ export default function HomePage() {
                 </div>
 
                 {/* Gerçek kira */}
-                <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5">
-                  <div className="flex items-center justify-between mb-3">
+                <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 sm:p-5">
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                       <span className="text-sm font-bold text-emerald-700">KiraNeKadar Medyan Fiyatı</span>
                     </div>
                     <span className="text-xs text-emerald-700 font-semibold bg-emerald-100 px-2 py-0.5 rounded-full">✓ Doğrulanmış</span>
                   </div>
-                  <div className="text-4xl font-black text-emerald-600">
+                  <div className="text-3xl font-black text-emerald-600 sm:text-4xl">
                     {loadingStats ? '...' : stats && stats.totalReports > 0 ? '31.500 ₺' : 'Veri bekleniyor'}
                   </div>
                   <div className="mt-2 h-2 bg-emerald-200 rounded-full overflow-hidden">
@@ -446,11 +446,11 @@ export default function HomePage() {
       </section>
 
       {/* ═══════════════ POPULAR CITIES ═══════════════ */}
-      <section className="py-20 bg-[#F8F5EF]">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="text-center mb-12 space-y-3">
+      <section className="py-14 sm:py-20 bg-[#F8F5EF]">
+        <div className="mx-auto w-full max-w-7xl px-3 sm:px-4 md:px-6">
+          <div className="text-center mb-10 space-y-3 sm:mb-12">
             <div className="section-label">Şehirler</div>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
+            <h2 className="text-2xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
               En çok veri girilen şehirler
             </h2>
             <p className="text-gray-500 max-w-md mx-auto text-sm">
@@ -465,8 +465,8 @@ export default function HomePage() {
               const avgRent = pc && pc.avgRent > 0 ? `${pc.avgRent.toLocaleString('tr-TR')} ₺` : 'Veri girilmesi bekleniyor';
               return (
                 <Link key={city.slug} href={`/${city.slug}-kira-fiyatlari`}>
-                  <div className="bg-white rounded-2xl border border-gray-100 p-5 clean-card-hover group flex items-center justify-between">
-                    <div className="flex items-center gap-4">
+                  <div className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-5 clean-card-hover group flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex min-w-0 items-center gap-3 sm:gap-4">
                       <div className="h-12 w-12 rounded-xl bg-gray-50 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
                         {city.emoji}
                       </div>
@@ -477,8 +477,8 @@ export default function HomePage() {
                         </p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className={avgRent === 'Veri girilmesi bekleniyor' ? "text-xs font-semibold text-gray-400" : "text-base font-extrabold text-gray-900"}>
+                    <div className="w-full text-left sm:w-auto sm:text-right">
+                      <div className={avgRent === 'Veri girilmesi bekleniyor' ? "text-sm font-semibold leading-5 text-gray-400 sm:text-xs" : "text-base font-extrabold text-gray-900"}>
                         {loadingStats ? 'Yükleniyor...' : avgRent}
                       </div>
                       <div className="text-[10px] text-gray-400 font-semibold uppercase tracking-wide">ort. kira</div>
@@ -492,12 +492,12 @@ export default function HomePage() {
       </section>
 
       {/* ═══════════════ TRUST FEATURES ═══════════════ */}
-      <section className="py-20 bg-white border-y border-gray-100">
-        <div className="container mx-auto px-4 md:px-6">
+      <section className="py-14 sm:py-20 bg-white border-y border-gray-100">
+        <div className="mx-auto w-full max-w-7xl px-3 sm:px-4 md:px-6">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-14 space-y-3">
               <div className="section-label">Güven & Gizlilik</div>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
+              <h2 className="text-2xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
                 Verileriniz bizde güvende
               </h2>
             </div>
@@ -506,7 +506,7 @@ export default function HomePage() {
               {TRUST_FEATURES.map((f, i) => (
                 <div
                   key={i}
-                  className="flex gap-5 p-6 rounded-2xl border border-gray-100 bg-gray-50 hover:border-gray-200 transition-colors group"
+                  className="flex gap-4 p-4 sm:gap-5 sm:p-6 rounded-2xl border border-gray-100 bg-gray-50 hover:border-gray-200 transition-colors group"
                 >
                   <div
                     className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl group-hover:scale-110 transition-transform"
@@ -526,12 +526,12 @@ export default function HomePage() {
       </section>
 
       {/* ═══════════════ CTA BANNER ═══════════════ */}
-      <section className="py-20 bg-gray-900">
-        <div className="container mx-auto px-4 md:px-6 text-center max-w-2xl space-y-6">
+      <section className="py-14 sm:py-20 bg-gray-900">
+        <div className="mx-auto w-full max-w-2xl px-3 sm:px-4 md:px-6 text-center space-y-6">
           <div className="inline-flex items-center gap-2 bg-emerald-600/20 rounded-full px-4 py-1.5 border border-emerald-500/30">
             <span className="text-xs font-semibold text-emerald-400">Topluluğa Katıl</span>
           </div>
-          <h2 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight leading-tight">
+          <h2 className="text-2xl md:text-4xl font-extrabold text-white tracking-tight leading-tight">
             Kira bilgini gir, gerçek<br />piyasa haritasını çizelim
           </h2>
           <p className="text-gray-400 text-sm leading-relaxed max-w-lg mx-auto">
@@ -557,11 +557,11 @@ export default function HomePage() {
       </section>
 
       {/* ═══════════════ FAQ ═══════════════ */}
-      <section id="sss" className="py-20 bg-[#F8F5EF]">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="text-center mb-14 space-y-3">
+      <section id="sss" className="py-14 sm:py-20 bg-[#F8F5EF]">
+        <div className="mx-auto w-full max-w-7xl px-3 sm:px-4 md:px-6">
+          <div className="text-center mb-10 space-y-3 sm:mb-14">
             <div className="section-label">SSS</div>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
+            <h2 className="text-2xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
               Sık sorulan sorular
             </h2>
           </div>
@@ -575,7 +575,7 @@ export default function HomePage() {
                 <button
                   id={`faq-${i}`}
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  className="flex w-full items-center justify-between px-6 py-5 text-left font-semibold text-gray-900 text-sm hover:bg-gray-50 transition-colors"
+                  className="flex w-full items-center justify-between px-4 py-4 text-left font-semibold text-gray-900 text-sm hover:bg-gray-50 transition-colors sm:px-6 sm:py-5"
                 >
                   <span>{faq.q}</span>
                   <span className="ml-4 shrink-0 flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 group-hover:bg-emerald-50 transition-colors">
@@ -587,7 +587,7 @@ export default function HomePage() {
                   </span>
                 </button>
                 {openFaq === i && (
-                  <div className="px-6 pb-5 text-sm text-gray-500 leading-relaxed animate-fade-in border-t border-gray-50 pt-4">
+                  <div className="px-4 pb-5 text-sm text-gray-500 leading-relaxed animate-fade-in border-t border-gray-50 pt-4 sm:px-6">
                     {faq.a}
                   </div>
                 )}
