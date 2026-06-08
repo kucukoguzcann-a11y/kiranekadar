@@ -299,7 +299,7 @@ export default function Header({ user }: HeaderProps) {
                       setMobileOpen(false);
                       setShowPreFormModal(true);
                     }}
-                    className="h-12 rounded-xl bg-emerald-600 text-sm font-extrabold text-white shadow-md shadow-emerald-100 hover:bg-emerald-700 cursor-pointer"
+                    className="!h-12 !min-h-12 !rounded-xl bg-emerald-600 !text-sm !font-extrabold text-white shadow-md shadow-emerald-100 hover:bg-emerald-700 cursor-pointer"
                   >
                     <PlusCircle className="mr-2 h-4 w-4" />
                     Kirayı Anonim Bildir

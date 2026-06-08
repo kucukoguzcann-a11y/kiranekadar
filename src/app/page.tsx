@@ -212,17 +212,17 @@ export default function HomePage() {
               <div className="flex flex-col gap-3 pt-3 sm:flex-row">
                 <Button
                   onClick={handleOpenAnalizModal}
-                  className="flex-1 h-14 rounded-2xl bg-emerald-600 px-5 text-base font-extrabold text-white shadow-lg shadow-emerald-100 transition-all hover:bg-emerald-700 hover:shadow-xl hover:shadow-emerald-200 cursor-pointer sm:h-12 sm:rounded-xl sm:text-sm"
+                  className="flex-1 !h-14 !min-h-14 !rounded-2xl bg-emerald-600 !px-5 !text-base !font-extrabold text-white shadow-lg shadow-emerald-100 transition-all hover:bg-emerald-700 hover:shadow-xl hover:shadow-emerald-200 cursor-pointer sm:!h-12 sm:!min-h-12 sm:!rounded-xl sm:!text-sm"
                 >
-                  <Search className="mr-2 h-5 w-5 sm:h-4 sm:w-4" />
+                  <Search className="mr-2 !size-5 sm:!size-4" />
                   Kira Analizi Yap
                 </Button>
                 <Button
                   onClick={handleOpenReportModal}
                   variant="outline"
-                  className="flex-1 h-14 rounded-2xl border-2 border-emerald-100 bg-white px-5 text-base font-extrabold text-gray-800 shadow-md transition-all hover:bg-emerald-50 hover:border-emerald-200 hover:shadow-lg cursor-pointer sm:h-12 sm:rounded-xl sm:border-gray-200 sm:text-sm"
+                  className="flex-1 !h-14 !min-h-14 !rounded-2xl border-2 border-emerald-100 bg-white !px-5 !text-base !font-extrabold text-gray-800 shadow-md transition-all hover:bg-emerald-50 hover:border-emerald-200 hover:shadow-lg cursor-pointer sm:!h-12 sm:!min-h-12 sm:!rounded-xl sm:border-gray-200 sm:!text-sm"
                 >
-                  <PlusCircle className="mr-2 h-5 w-5 text-emerald-600 sm:h-4 sm:w-4" />
+                  <PlusCircle className="mr-2 !size-5 text-emerald-600 sm:!size-4" />
                   Kirayı Anonim Bildir
                 </Button>
               </div>
