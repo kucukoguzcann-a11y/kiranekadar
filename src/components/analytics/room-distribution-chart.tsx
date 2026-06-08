@@ -41,7 +41,7 @@ export default function RoomDistributionChart({ reports }: RoomDistributionChart
 
   if (!mounted) {
     return (
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm h-[350px] flex items-center justify-center">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm h-[300px] sm:h-[350px] flex items-center justify-center">
         <div className="h-4 w-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -65,19 +65,19 @@ export default function RoomDistributionChart({ reports }: RoomDistributionChart
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-      <div className="px-6 py-5 border-b border-gray-50">
+      <div className="px-4 py-4 border-b border-gray-50 sm:px-6 sm:py-5">
         <div className="flex items-center gap-2">
           <div className="h-7 w-7 bg-orange-50 rounded-lg flex items-center justify-center">
             <BarChart3 className="h-3.5 w-3.5 text-orange-600" />
           </div>
           <h3 className="text-sm font-bold text-gray-900">Oda Dağılımı</h3>
         </div>
-        <p className="text-xs text-gray-400 mt-1 ml-9">Oda sayısına göre daire dağılımı</p>
+        <p className="text-[11px] text-gray-400 mt-1 ml-9 leading-4 sm:text-xs">Oda sayısına göre daire dağılımı</p>
       </div>
 
-      <div className="h-[280px] pt-4 pr-4 pb-2">
+      <div className="h-[240px] pt-4 pr-2 pb-2 sm:h-[280px] sm:pr-4">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={finalData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
+          <BarChart data={finalData} margin={{ top: 10, right: 8, left: 0, bottom: 0 }}>
             <XAxis
               dataKey="room"
               tickLine={false}

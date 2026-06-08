@@ -50,16 +50,16 @@ export default function KiraAnaliziTeaser() {
   return (
     <div className="bg-slate-50 min-h-screen">
       {/* Hero Header */}
-      <section className="relative overflow-hidden bg-slate-900 text-white py-20 px-4">
+      <section className="relative overflow-hidden bg-slate-900 text-white px-4 py-14 sm:py-20">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-emerald-900/40 via-slate-900 to-slate-950" />
         <div className="container mx-auto max-w-5xl relative z-10 text-center space-y-6">
           <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
             <Lock className="w-3 h-3" /> Üyelere Özel Ücretsiz Araç
           </span>
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
+          <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl">
             Detaylı <span className="text-emerald-500 bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">Kira Analizi</span> ve Bölge Raporu
           </h1>
-          <p className="text-lg text-slate-300 max-w-2xl mx-auto">
+          <p className="text-sm leading-6 text-slate-300 max-w-2xl mx-auto sm:text-lg">
             İlanlar arasındaki kafa karıştırıcı fiyatları unutun. Bölgenin gerçek ödenen kira ortalamasını, m² birim fiyatını ve dağılım grafiklerini tek raporda görüntüleyin.
           </p>
           <div className="pt-4 flex flex-col sm:flex-row justify-center gap-3">
@@ -74,30 +74,30 @@ export default function KiraAnaliziTeaser() {
       </section>
 
       {/* Mock Analytics / Demo Screen */}
-      <section className="container mx-auto max-w-5xl -mt-10 px-4 relative z-20">
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xl overflow-hidden relative aspect-[16/9] min-h-[350px]">
+      <section className="mx-auto w-full max-w-5xl -mt-8 px-3 sm:-mt-10 sm:px-4 relative z-20">
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xl overflow-hidden relative h-[360px] w-full max-w-full sm:h-auto sm:aspect-[16/9] sm:min-h-[350px]">
           {/* Simulated Charts and Stats */}
-          <div className="absolute inset-0 bg-slate-50 p-6 opacity-60 pointer-events-none select-none">
-            <div className="flex flex-col gap-6 h-full justify-between">
-              <div className="grid grid-cols-4 gap-4">
-                <div className="bg-white border border-slate-200 p-3 rounded-lg"><div className="h-4 w-16 bg-slate-200 rounded mb-2" /><div className="h-6 w-24 bg-slate-300 rounded" /></div>
-                <div className="bg-white border border-slate-200 p-3 rounded-lg"><div className="h-4 w-16 bg-slate-200 rounded mb-2" /><div className="h-6 w-24 bg-slate-300 rounded" /></div>
-                <div className="bg-white border border-slate-200 p-3 rounded-lg"><div className="h-4 w-16 bg-slate-200 rounded mb-2" /><div className="h-6 w-24 bg-slate-300 rounded" /></div>
-                <div className="bg-white border border-slate-200 p-3 rounded-lg"><div className="h-4 w-16 bg-slate-200 rounded mb-2" /><div className="h-6 w-24 bg-slate-300 rounded" /></div>
+          <div className="absolute inset-0 bg-slate-50 p-4 opacity-60 pointer-events-none select-none sm:p-6">
+            <div className="flex flex-col gap-4 h-full justify-between sm:gap-6">
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+                <div className="bg-white border border-slate-200 p-3 rounded-lg"><div className="h-4 w-14 bg-slate-200 rounded mb-2 sm:w-16" /><div className="h-6 w-20 bg-slate-300 rounded sm:w-24" /></div>
+                <div className="bg-white border border-slate-200 p-3 rounded-lg"><div className="h-4 w-14 bg-slate-200 rounded mb-2 sm:w-16" /><div className="h-6 w-20 bg-slate-300 rounded sm:w-24" /></div>
+                <div className="bg-white border border-slate-200 p-3 rounded-lg"><div className="h-4 w-14 bg-slate-200 rounded mb-2 sm:w-16" /><div className="h-6 w-20 bg-slate-300 rounded sm:w-24" /></div>
+                <div className="bg-white border border-slate-200 p-3 rounded-lg"><div className="h-4 w-14 bg-slate-200 rounded mb-2 sm:w-16" /><div className="h-6 w-20 bg-slate-300 rounded sm:w-24" /></div>
               </div>
-              <div className="bg-white border border-slate-200 p-4 rounded-xl flex-1 flex items-end justify-between gap-2 px-10">
-                <div className="w-12 bg-slate-200 rounded-t h-[40%]" />
-                <div className="w-12 bg-slate-300 rounded-t h-[60%]" />
-                <div className="w-12 bg-slate-200 rounded-t h-[50%]" />
-                <div className="w-12 bg-emerald-300 rounded-t h-[80%]" />
-                <div className="w-12 bg-slate-200 rounded-t h-[30%]" />
+              <div className="bg-white border border-slate-200 p-4 rounded-xl flex-1 flex items-end justify-between gap-2 px-4 sm:px-10">
+                <div className="w-8 bg-slate-200 rounded-t h-[40%] sm:w-12" />
+                <div className="w-8 bg-slate-300 rounded-t h-[60%] sm:w-12" />
+                <div className="w-8 bg-slate-200 rounded-t h-[50%] sm:w-12" />
+                <div className="w-8 bg-emerald-300 rounded-t h-[80%] sm:w-12" />
+                <div className="w-8 bg-slate-200 rounded-t h-[30%] sm:w-12" />
               </div>
             </div>
           </div>
 
           {/* Locked Overlay */}
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[4px] flex flex-col items-center justify-center text-center p-6 text-white">
-            <div className="max-w-md space-y-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[4px] flex flex-col items-center justify-center text-center p-4 text-white sm:p-6">
+            <div className="w-full max-w-md space-y-4">
               <div className="mx-auto w-12 h-12 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 mb-2">
                 <Lock className="w-6 h-6" />
               </div>
@@ -106,7 +106,7 @@ export default function KiraAnaliziTeaser() {
                 İl, ilçe ve mahalle bazında detaylı grafikler, m² kira trendleri, oda sayısı dağılımları ve tarihsel değişimleri görmek için ücretsiz üye olun.
               </p>
               <div className="pt-2">
-                <Button className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold cursor-pointer" asChild>
+                <Button className="h-auto whitespace-normal bg-emerald-600 hover:bg-emerald-700 text-white font-semibold cursor-pointer px-4 py-3" asChild>
                   <Link href="/register">
                     <UserPlus className="w-4 h-4 mr-2" /> Ücretsiz Üye Ol ve Analizleri Aç
                   </Link>

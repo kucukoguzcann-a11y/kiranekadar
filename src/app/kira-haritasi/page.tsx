@@ -50,16 +50,16 @@ export default function KiraHaritasiTeaser() {
   return (
     <div className="bg-slate-50 min-h-screen">
       {/* Hero Header */}
-      <section className="relative overflow-hidden bg-slate-900 text-white py-20 px-4">
+      <section className="relative overflow-hidden bg-slate-900 text-white px-4 py-14 sm:py-20">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-emerald-900/40 via-slate-900 to-slate-950" />
         <div className="container mx-auto max-w-5xl relative z-10 text-center space-y-6">
           <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
             <Lock className="w-3 h-3" /> Üyelere Özel Ücretsiz Araç
           </span>
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
+          <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl">
             Türkiye'nin İlk Gerçek Verili <span className="text-emerald-500 bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">Kira Haritası</span>
           </h1>
-          <p className="text-lg text-slate-300 max-w-2xl mx-auto">
+          <p className="text-sm leading-6 text-slate-300 max-w-2xl mx-auto sm:text-lg">
             Sahibinden ilan fiyatlarını değil, kiracıların anonim olarak paylaştığı gerçek kira kontratı tutarlarını interaktif harita üzerinde mahalle mahalle keşfedin.
           </p>
           <div className="pt-4 flex flex-col sm:flex-row justify-center gap-3">
@@ -74,31 +74,31 @@ export default function KiraHaritasiTeaser() {
       </section>
 
       {/* Mock Map / Demo Screen */}
-      <section className="container mx-auto max-w-5xl -mt-10 px-4 relative z-20">
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xl overflow-hidden relative aspect-[16/9] min-h-[350px]">
+      <section className="mx-auto w-full max-w-5xl -mt-8 px-3 sm:-mt-10 sm:px-4 relative z-20">
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xl overflow-hidden relative h-[360px] w-full max-w-full sm:h-auto sm:aspect-[16/9] sm:min-h-[350px]">
           {/* Simulated Map Background */}
-          <div className="absolute inset-0 bg-slate-100 flex flex-col justify-between p-6 opacity-80 pointer-events-none select-none">
+          <div className="absolute inset-0 bg-slate-100 flex flex-col justify-between p-4 opacity-80 pointer-events-none select-none sm:p-6">
             {/* Mock Map Roads/Pins */}
             <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:16px_16px] opacity-40" />
             
             {/* Simulated Pins */}
-            <div className="absolute top-[25%] left-[20%] bg-emerald-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-md flex items-center gap-1">
+            <div className="absolute top-[25%] left-[8%] bg-emerald-600 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-md flex items-center gap-1 sm:left-[20%] sm:text-xs">
               <span>Kadıköy: 32.500 ₺</span>
             </div>
-            <div className="absolute top-[40%] left-[60%] bg-emerald-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-md flex items-center gap-1">
+            <div className="absolute top-[40%] left-[48%] bg-emerald-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-md flex items-center gap-1 sm:left-[60%] sm:text-xs">
               <span>Beşiktaş: 37.000 ₺</span>
             </div>
-            <div className="absolute top-[70%] left-[45%] bg-teal-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-md flex items-center gap-1">
+            <div className="absolute top-[70%] left-[34%] bg-teal-600 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-md flex items-center gap-1 sm:left-[45%] sm:text-xs">
               <span>Ataşehir: 25.000 ₺</span>
             </div>
-            <div className="absolute top-[55%] left-[15%] bg-emerald-700 text-white text-xs font-bold px-2 py-1 rounded-full shadow-md flex items-center gap-1">
+            <div className="absolute top-[55%] left-[5%] bg-emerald-700 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-md flex items-center gap-1 sm:left-[15%] sm:text-xs">
               <span>Üsküdar: 28.000 ₺</span>
             </div>
           </div>
 
           {/* Locked Overlay */}
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[4px] flex flex-col items-center justify-center text-center p-6 text-white">
-            <div className="max-w-md space-y-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[4px] flex flex-col items-center justify-center text-center p-4 text-white sm:p-6">
+            <div className="w-full max-w-md space-y-4">
               <div className="mx-auto w-12 h-12 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 mb-2">
                 <Lock className="w-6 h-6" />
               </div>
@@ -107,7 +107,7 @@ export default function KiraHaritasiTeaser() {
                 Seçtiğiniz lokasyonun sokak düzeyindeki kira dağılımını, mahalle ortalamalarını ve filtre katmanlarını görmek için ücretsiz üye olun.
               </p>
               <div className="pt-2">
-                <Button className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold cursor-pointer" asChild>
+                <Button className="h-auto whitespace-normal bg-emerald-600 hover:bg-emerald-700 text-white font-semibold cursor-pointer px-4 py-3" asChild>
                   <Link href="/register">
                     <UserPlus className="w-4 h-4 mr-2" /> Ücretsiz Üye Ol ve Haritayı Aç
                   </Link>

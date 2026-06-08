@@ -47,7 +47,7 @@ export default function SqmPriceChart({ reports }: SqmPriceChartProps) {
 
   if (!mounted) {
     return (
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm h-[320px] flex items-center justify-center">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm h-[300px] sm:h-[320px] flex items-center justify-center">
         <div className="h-4 w-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -70,19 +70,19 @@ export default function SqmPriceChart({ reports }: SqmPriceChartProps) {
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-      <div className="px-6 py-5 border-b border-gray-50">
+      <div className="px-4 py-4 border-b border-gray-50 sm:px-6 sm:py-5">
         <div className="flex items-center gap-2">
           <div className="h-7 w-7 bg-purple-50 rounded-lg flex items-center justify-center">
             <Maximize className="h-3.5 w-3.5 text-purple-600" />
           </div>
           <h3 className="text-sm font-bold text-gray-900">Metrekare / Kira İlişkisi</h3>
         </div>
-        <p className="text-xs text-gray-400 mt-1 ml-9">Daire büyüklüğü ile kira arasındaki dağılım</p>
+        <p className="text-[11px] text-gray-400 mt-1 ml-9 leading-4 sm:text-xs">Daire büyüklüğü ile kira arasındaki dağılım</p>
       </div>
 
-      <div className="h-[252px] pt-4 pr-4 pb-2">
+      <div className="h-[240px] pt-4 pr-2 pb-2 sm:h-[252px] sm:pr-4">
         <ResponsiveContainer width="100%" height="100%">
-          <ScatterChart margin={{ top: 10, right: 15, left: 5, bottom: 5 }}>
+          <ScatterChart margin={{ top: 10, right: 8, left: 0, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" vertical={false} />
             <XAxis
               type="number"
@@ -101,7 +101,7 @@ export default function SqmPriceChart({ reports }: SqmPriceChartProps) {
               axisLine={false}
               tick={{ fontSize: 10, fill: '#9CA3AF', fontWeight: 500 }}
               tickFormatter={(val) => `${(val / 1000).toFixed(0)}K`}
-              width={34}
+              width={30}
             />
             <ZAxis type="category" dataKey="room" name="Oda" />
             <Tooltip content={<CustomTooltip />} cursor={{ strokeDasharray: '3 3', stroke: '#E5E7EB' }} />

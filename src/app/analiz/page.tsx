@@ -274,17 +274,17 @@ export default function AnalizPage() {
   }, [summary, loading, cityId, districtId, neighborhoodId, propertyType, roomCount, dateRange, cityName, districtName]);
 
   return (
-    <div className="min-h-screen bg-[#F8F5EF] py-8">
-      <div className="container mx-auto px-4 md:px-6 space-y-6">
+    <div className="min-h-screen bg-[#F8F5EF] py-4 sm:py-6 md:py-8">
+      <div className="mx-auto w-full max-w-7xl px-3 sm:px-4 md:px-6 space-y-4 sm:space-y-6">
 
         {/* Page Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
           <div className="space-y-1">
             <div className="section-label">Dashboard</div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+            <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
               Kira Analiz Paneli
             </h1>
-            <p className="text-sm text-gray-500">
+            <p className="text-xs leading-5 text-gray-500 sm:text-sm">
               Seçilen bölgeye ait gerçek hayatta ödenen kira fiyatlarının detaylı analizi.
             </p>
           </div>
@@ -296,7 +296,7 @@ export default function AnalizPage() {
             variant="outline"
             size="sm"
             disabled={loading}
-            className="w-fit gap-1.5 self-start md:self-center bg-white border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-gray-50 shadow-sm rounded-xl"
+            className="w-full gap-1.5 self-start bg-white border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-gray-50 shadow-sm rounded-xl sm:w-fit md:self-center"
           >
             <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
             Yenile
@@ -304,11 +304,11 @@ export default function AnalizPage() {
         </div>
 
         {/* ─── Filters ─────────────────────────────────────────────────── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-3">
 
           {/* Location Card */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-            <div className="flex items-center gap-2 mb-5">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6">
+            <div className="flex items-center gap-2 mb-4 sm:mb-5">
               <div className="h-8 w-8 bg-emerald-50 rounded-lg flex items-center justify-center">
                 <Search className="h-4 w-4 text-emerald-600" />
               </div>
@@ -318,7 +318,7 @@ export default function AnalizPage() {
               </div>
             </div>
             <LocationSelector
-              className="flex flex-col gap-4"
+              className="flex flex-col gap-3 sm:gap-4"
               cityId={cityId}
               districtId={districtId}
               neighborhoodId={neighborhoodId}
@@ -347,8 +347,8 @@ export default function AnalizPage() {
           </div>
 
           {/* Property Filters */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 lg:col-span-2">
-            <div className="flex items-center gap-2 mb-5">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 lg:col-span-2">
+            <div className="flex items-center gap-2 mb-4 sm:mb-5">
               <div className="h-8 w-8 bg-blue-50 rounded-lg flex items-center justify-center">
                 <SlidersHorizontal className="h-4 w-4 text-blue-600" />
               </div>
@@ -358,7 +358,7 @@ export default function AnalizPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
               {/* Property Type */}
               <div className="space-y-1.5">
                 <Label htmlFor="propType" className="text-xs font-semibold text-gray-600">Konut Tipi</Label>
@@ -546,9 +546,9 @@ export default function AnalizPage() {
           ) : (
             <div className="space-y-6 animate-fade-in">
 
-            <aside data-ai-snippet="true" className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4">
+            <aside data-ai-snippet="true" className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4 sm:p-5">
               <h2 className="text-sm font-bold text-emerald-900">Hizli Ozet</h2>
-              <div className="mt-2 whitespace-pre-wrap text-xs leading-6 text-emerald-950">
+              <div className="mt-2 whitespace-pre-wrap text-[11px] leading-6 text-emerald-950 sm:text-xs">
                 {`# Kira Ozeti
 - Bolge: ${districtName ? `${districtName}, ${cityName}` : cityName || 'Secilen bolge'}
 - Medyan kira: ${formatCurrency(summary.medianRent)}
@@ -561,7 +561,7 @@ export default function AnalizPage() {
             </aside>
 
             {/* Metric Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 md:grid-cols-3 lg:grid-cols-6">
               <MetricCard
                 title="Kayıt Sayısı"
                 value={summary.count}
@@ -607,16 +607,16 @@ export default function AnalizPage() {
             </div>
 
             {/* Charts */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              <div className="col-span-1 lg:col-span-2">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 lg:gap-5">
+              <div className="min-w-0 lg:col-span-2">
                 <RentTrendChart data={trends} />
               </div>
-              <div className="col-span-1">
+              <div className="min-w-0">
                 <RoomDistributionChart reports={reports} />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:gap-5">
               <BuildingAgeChart reports={reports} />
               <SqmPriceChart reports={reports} />
             </div>

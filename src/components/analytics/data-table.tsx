@@ -78,8 +78,72 @@ export default function DataTable({ reports }: DataTableProps) {
   }
 
   return (
-    <div className="w-full overflow-hidden border border-gray-100 rounded-2xl bg-white shadow-sm">
-      <div className="overflow-x-auto">
+    <>
+      <div className="space-y-3 md:hidden">
+        {reports.map((report) => (
+          <article key={report.id} className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <h4 className="truncate text-sm font-extrabold text-gray-900">
+                  {report.neighborhood.name}
+                </h4>
+                <p className="mt-0.5 text-[11px] text-gray-400">
+                  {report.district.name}, {report.city.name}
+                </p>
+              </div>
+              <div className="shrink-0 text-right">
+                <div className="text-base font-black text-gray-900">{formatCurrency(report.rentAmount)}</div>
+                <div className="mt-0.5 text-[10px] text-gray-400">Aylık kira</div>
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
+              <div className="rounded-xl bg-gray-50 px-3 py-2">
+                <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Konut</div>
+                <div className="mt-1 font-semibold text-gray-800">
+                  {getPropertyTypeLabel(report.propertyType)} · {report.roomCount}
+                </div>
+              </div>
+              <div className="rounded-xl bg-gray-50 px-3 py-2">
+                <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Alan</div>
+                <div className="mt-1 font-semibold text-gray-800">
+                  {report.netSqm} m² · {report.buildingAgeRange}
+                </div>
+              </div>
+              <div className="rounded-xl bg-gray-50 px-3 py-2">
+                <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Aidat</div>
+                <div className="mt-1 font-semibold text-gray-800">
+                  {report.duesAmount ? `${formatNumber(report.duesAmount)} ₺` : '—'}
+                </div>
+              </div>
+              <div className="rounded-xl bg-gray-50 px-3 py-2">
+                <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Güven</div>
+                <Badge
+                  variant="outline"
+                  className={cn("mt-1 text-[10px] font-bold px-2 py-0.5 inline-flex items-center gap-1", getTrustBadgeColor(report.trustScore))}
+                >
+                  <Shield className="h-3 w-3" />
+                  %{report.trustScore}
+                </Badge>
+              </div>
+            </div>
+
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+              {getRentTypeBadge(report.rentType)}
+              <span className="text-[11px] text-gray-400">
+                {new Date(report.createdAt).toLocaleDateString('tr-TR', {
+                  day: 'numeric',
+                  month: 'short',
+                  year: 'numeric',
+                })}
+              </span>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <div className="hidden w-full overflow-hidden border border-gray-100 rounded-2xl bg-white shadow-sm md:block">
+        <div className="overflow-x-auto">
         <Table>
           <TableHeader className="bg-gray-50">
             <TableRow className="border-gray-100">
@@ -163,7 +227,8 @@ export default function DataTable({ reports }: DataTableProps) {
             ))}
           </TableBody>
         </Table>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

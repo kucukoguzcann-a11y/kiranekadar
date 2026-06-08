@@ -74,9 +74,9 @@ export default function MetricCard({
         style={{ background: styles.topBar }}
       />
 
-      <div className="p-5 pt-6">
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+      <div className="p-4 pt-5 sm:p-5 sm:pt-6">
+        <div className="flex items-center justify-between gap-3 mb-3 sm:mb-4">
+          <span className="min-w-0 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
             {title}
           </span>
           <div
@@ -87,8 +87,8 @@ export default function MetricCard({
           </div>
         </div>
 
-        <div className="flex items-baseline gap-2">
-          <span className="text-2xl font-black tracking-tight text-gray-900">
+        <div className="flex flex-wrap items-baseline gap-2">
+          <span className="min-w-0 break-words text-xl font-black tracking-tight text-gray-900 sm:text-2xl">
             {value}
           </span>
           {trend && (
